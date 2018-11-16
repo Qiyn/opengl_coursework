@@ -1,21 +1,20 @@
 #pragma comment(lib, "nclgl.lib")
 
-#include "../../ext/nclgl/window.h"
 #include "Renderer.h"
+#include "../../ext/nclgl/window.h"
 
-int main() {
-	Window w("My First OpenGL 3 Triangle!", 800, 600, false);
-
-	if (!w.HasInitialised()) {
+int main() 
+{
+	Window window("CSC8502 Coursework 18/19 - By Hasan Ahmed", 1280, 720, false);
+	if (!window.HasInitialised()) 
 		return -1;
-	}
 
-	Renderer renderer(w);
-	if (!renderer.HasInitialised()) {
+	Renderer renderer(window);
+	if (!renderer.HasInitialised()) 
 		return -1;
-	}
 
-	while (w.UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)) {
+	while (window.UpdateWindow() && !Window::GetKeyboard()->KeyDown(KEYBOARD_ESCAPE)) 
+	{
 		renderer.RenderScene();
 	}
 
