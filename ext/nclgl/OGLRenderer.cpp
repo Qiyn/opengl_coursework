@@ -289,6 +289,9 @@ void OGLRenderer::DebugCallback(GLuint source, GLuint type,GLuint id, GLuint sev
 			case GL_DEBUG_SEVERITY_LOW_ARB		: severityName = "Priority(Low)"		;break;
 		}
 
+		if (typeName == "Type(Other)")
+			return;
+
 		cout << "OpenGL Debug Output: " + sourceName + ", " + typeName + ", " + severityName + ", " + string(message) << endl;
 }
 #endif
