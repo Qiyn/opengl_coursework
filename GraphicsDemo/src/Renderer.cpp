@@ -82,7 +82,7 @@ Renderer::~Renderer(void)
 	delete skyboxShader;
 	delete lightShader;
 	delete light;
-	delete root;
+	//delete root;
 
 	currentShader = 0;
 }
@@ -112,15 +112,14 @@ void Renderer::RenderScene()
 
 	DrawSkybox();
 	DrawHeightMap();
+	DrawWater();
 	
 	if (isStatsActive)
 		DrawStats();
 	
-	DrawWater();
-
 	//DrawNodes();
 
-	//glUseProgram(0);
+	glUseProgram(0);
 	SwapBuffers();
 	//ClearNodeLists();
 }
@@ -256,8 +255,6 @@ void Renderer::DrawHeightMap()
 
 void Renderer::DrawWater()
 {
-	
-
 	SetCurrentShader(reflectShader);
 	SetShaderLight(*light);
 
@@ -289,6 +286,8 @@ void Renderer::DrawWater()
 	quad->Draw();
 
 	glUseProgram(0);
+
+	textureMatrix.ToIdentity();
 }
 
 #pragma endregion
