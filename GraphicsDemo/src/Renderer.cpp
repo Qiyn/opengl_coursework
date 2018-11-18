@@ -7,8 +7,8 @@ Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(ti
 		SHADERDIR"ReflectFragment.glsl");
 	skyboxShader = new Shader(SHADERDIR"SkyboxVertex.glsl",
 		SHADERDIR"SkyboxFragment.glsl");
-	lightShader = new Shader(SHADERDIR"PerPixelVertex.glsl",
-		SHADERDIR"PerPixelFragment.glsl");
+	lightShader = new Shader(SHADERDIR"BumpVertex.glsl",
+		SHADERDIR"BumpFragment.glsl");
 	textTextureShader = new Shader(SHADERDIR"TexturedVertex.glsl", 
 		SHADERDIR"TexturedFragment.glsl");
 
