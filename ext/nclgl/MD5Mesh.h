@@ -60,7 +60,7 @@ than performing everything on the GPU.
 
 //Let the compiler know we should compile MD5Anim along with this class
 class MD5Anim;
-
+class MD5FileData;	//HBA
 
 /*
 Now for the actual class definition itself. We inherit the ability to store
