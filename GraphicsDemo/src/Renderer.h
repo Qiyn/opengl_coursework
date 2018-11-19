@@ -79,5 +79,16 @@ protected:
 	MD5FileData*		hellData;
 	MD5Node*			hellNode;
 
+	//Shadow Related
+	void InitShadow();
+	void DrawShadowScene();
+	void DrawCombinedScene();
+	void DrawShadowHellknight();
+
+	Shader* sceneShader;
+	Shader* shadowShader;
+
+	GLuint shadowTex;
+	GLuint shadowFBO;
 };
 

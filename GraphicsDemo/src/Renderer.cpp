@@ -7,15 +7,23 @@ Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(ti
 	InitHeightMap();
 	InitWater();
 	InitHellknight();
+	InitShadow();
 
 	camera = new Camera();
 	camera->SetPosition(Vector3(RAW_WIDTH*HEIGHTMAP_X / 2.0f, 500.0f, RAW_WIDTH*HEIGHTMAP_X));
 
+	projMatrix = Matrix4::Perspective(1.0f, 15000.0f, (float)width / (float)height, 45.0f);
+
 	init = true;
+	
+	glEnable(GL_DEPTH_TEST);
 }
 
 Renderer::~Renderer(void) 
 {
+	glDeleteTextures(1, &shadowTex);
+	glDeleteFramebuffers(1, &shadowFBO);
+
 	delete camera;
 	delete basicFont;
 	delete fpsTextMesh;
@@ -29,6 +37,8 @@ Renderer::~Renderer(void)
 	delete hellData;
 	delete hellNode;
 	//delete root;
+	delete sceneShader;
+	delete shadowShader;
 
 	currentShader = 0;
 }
@@ -62,12 +72,12 @@ void Renderer::RenderScene()
 	DrawHeightMap();
 	DrawWater();
 
-	DrawHellknight();
+	DrawShadowScene();
+	DrawCombinedScene();
 
 	if (isStatsActive)
 		DrawStats();
 	
-
 	//DrawNodes();
 
 	glUseProgram(0);
@@ -386,5 +396,116 @@ void Renderer::DrawHellknight()
 }
 
 #pragma endregion
+
+#pragma endregion
+
+#pragma region Shadow
+
+void Renderer::InitShadow()
+{
+	sceneShader = new Shader(SHADERDIR"shadowscenevert.glsl",
+		SHADERDIR"shadowscenefrag.glsl");
+	shadowShader = new Shader(SHADERDIR"shadowVert.glsl",
+		SHADERDIR"shadowFrag.glsl");
+
+	if (!sceneShader->LinkProgram() || !shadowShader->LinkProgram())
+	{
+		return;
+	}
+
+	glGenTextures(1, &shadowTex);
+	glBindTexture(GL_TEXTURE_2D, shadowTex);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+		SHADOWSIZE, SHADOWSIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glGenFramebuffers(1, &shadowFBO);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowTex, 0);
+	glDrawBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::DrawShadowScene()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+
+	glViewport(0, 0, SHADOWSIZE, SHADOWSIZE);
+
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+	SetCurrentShader(shadowShader);
+
+	viewMatrix = Matrix4::BuildViewMatrix(light->GetPosition(), Vector3(0, 0, 0));
+
+	textureMatrix = biasMatrix * (projMatrix*viewMatrix);
+
+	UpdateShaderMatrices();
+
+	DrawShadowHellknight();
+
+	glUseProgram(0);
+
+	glDisable(GL_DEPTH_TEST);
+
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+	glViewport(0, 0, width, height);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::DrawCombinedScene()
+{
+	glEnable(GL_DEPTH_TEST);
+
+	SetCurrentShader(sceneShader);
+	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
+	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "bumpTex"), 1);
+	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "shadowTex"), 2);
+
+	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(), "cameraPos"), 1, (float*)&camera->GetPosition());
+
+	SetShaderLight(*light);
+
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, shadowTex);
+
+	viewMatrix = camera->BuildViewMatrix();
+	UpdateShaderMatrices();
+
+	DrawShadowHellknight();
+
+	glUseProgram(0);
+
+	glDisable(GL_DEPTH_TEST);
+}
+
+void Renderer::DrawShadowHellknight()
+{
+	modelMatrix = (
+		Matrix4::Translation(Vector3((RAW_WIDTH*HEIGHTMAP_X / 2.0f) + 400.0f, 300.0f, (RAW_WIDTH*HEIGHTMAP_X / 2.0f) - 200.0f)) *
+		Matrix4::Rotation(45, Vector3(0, 1, 0)) *
+		Matrix4::Scale(Vector3(5.0f, 5.0f, 5.0f))
+		);
+
+	Matrix4 tempMatrix = textureMatrix * modelMatrix;
+
+	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "textureMatrix"), 1, false, *&tempMatrix.values);
+	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "modelMatrix"), 1, false, *&modelMatrix.values);
+
+	hellNode->Draw(*this);
+}
 
 #pragma endregion
