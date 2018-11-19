@@ -6,6 +6,35 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GraphicsDemo", "GraphicsDemo\GraphicsDemo.vcxproj", "{FC7311B5-E48D-42A0-B4DF-C2BD806FED08}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "res", "res", "{B0781DAC-7AE7-4D36-96C1-1BC581AA4F32}"
+	ProjectSection(SolutionItems) = preProject
+		res\Shaders\basicVertex.glsl = res\Shaders\basicVertex.glsl
+		res\Shaders\bufferFragment.glsl = res\Shaders\bufferFragment.glsl
+		res\Shaders\BumpFragment.glsl = res\Shaders\BumpFragment.glsl
+		res\Shaders\BumpVertex.glsl = res\Shaders\BumpVertex.glsl
+		res\Shaders\colourFragment.glsl = res\Shaders\colourFragment.glsl
+		res\Shaders\combinefragment.glsl = res\Shaders\combinefragment.glsl
+		res\Shaders\combinevertex.glsl = res\Shaders\combinevertex.glsl
+		res\Shaders\debugFragment.glsl = res\Shaders\debugFragment.glsl
+		res\Shaders\debugVertex.glsl = res\Shaders\debugVertex.glsl
+		res\Shaders\MatrixVertex.glsl = res\Shaders\MatrixVertex.glsl
+		res\Shaders\PerPixelFragment.glsl = res\Shaders\PerPixelFragment.glsl
+		res\Shaders\PerPixelVertex.glsl = res\Shaders\PerPixelVertex.glsl
+		res\Shaders\pointlightfragment.glsl = res\Shaders\pointlightfragment.glsl
+		res\Shaders\pointlightvertex.glsl = res\Shaders\pointlightvertex.glsl
+		res\Shaders\processfrag.glsl = res\Shaders\processfrag.glsl
+		res\Shaders\ReflectFragment.glsl = res\Shaders\ReflectFragment.glsl
+		res\Shaders\SceneFragment.glsl = res\Shaders\SceneFragment.glsl
+		res\Shaders\SceneVertex.glsl = res\Shaders\SceneVertex.glsl
+		res\Shaders\shadowFrag.glsl = res\Shaders\shadowFrag.glsl
+		res\Shaders\shadowscenefrag.glsl = res\Shaders\shadowscenefrag.glsl
+		res\Shaders\shadowscenevert.glsl = res\Shaders\shadowscenevert.glsl
+		res\Shaders\shadowVert.glsl = res\Shaders\shadowVert.glsl
+		res\Shaders\SkyboxFragment.glsl = res\Shaders\SkyboxFragment.glsl
+		res\Shaders\SkyboxVertex.glsl = res\Shaders\SkyboxVertex.glsl
+		res\Shaders\StencilFragment.glsl = res\Shaders\StencilFragment.glsl
+		res\Shaders\TexturedFragment.glsl = res\Shaders\TexturedFragment.glsl
+		res\Shaders\TexturedVertex.glsl = res\Shaders\TexturedVertex.glsl
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nclgl", "ext\nclgl\nclgl.vcxproj", "{98D6B51B-CB0A-4389-ADC6-24082B967C3F}"
 EndProject

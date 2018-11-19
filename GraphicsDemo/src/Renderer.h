@@ -80,10 +80,12 @@ protected:
 	MD5Node*			hellNode;
 
 	//Shadow Related
-	void InitShadow();
-	void DrawShadowScene();
-	void DrawCombinedScene();
-	void DrawShadowHellknight();
+	void				InitShadow();
+	void				DrawShadowScene();
+	void				DrawCombinedScene();
+
+	void				DrawShadowHeightMap();
+	void				DrawShadowHellknight();
 
 	Shader* sceneShader;
 	Shader* shadowShader;

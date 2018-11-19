@@ -69,11 +69,11 @@ void Renderer::RenderScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	DrawSkybox();
-	DrawHeightMap();
-	DrawWater();
+	//DrawHeightMap();
 
 	DrawShadowScene();
 	DrawCombinedScene();
+	DrawWater();
 
 	if (isStatsActive)
 		DrawStats();
@@ -439,30 +439,25 @@ void Renderer::DrawShadowScene()
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 
 	glClear(GL_DEPTH_BUFFER_BIT);
-
 	glEnable(GL_DEPTH_TEST);
-
 	glViewport(0, 0, SHADOWSIZE, SHADOWSIZE);
-
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
 	SetCurrentShader(shadowShader);
 
 	viewMatrix = Matrix4::BuildViewMatrix(light->GetPosition(), Vector3(0, 0, 0));
-
 	textureMatrix = biasMatrix * (projMatrix*viewMatrix);
 
 	UpdateShaderMatrices();
 
+	DrawShadowHeightMap();
 	DrawShadowHellknight();
 
 	glUseProgram(0);
-
 	glDisable(GL_DEPTH_TEST);
-
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
 	glViewport(0, 0, width, height);
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -485,6 +480,7 @@ void Renderer::DrawCombinedScene()
 	viewMatrix = camera->BuildViewMatrix();
 	UpdateShaderMatrices();
 
+	DrawShadowHeightMap();
 	DrawShadowHellknight();
 
 	glUseProgram(0);
@@ -492,8 +488,32 @@ void Renderer::DrawCombinedScene()
 	glDisable(GL_DEPTH_TEST);
 }
 
+void Renderer::DrawShadowHeightMap()
+{
+	glEnable(GL_DEPTH_TEST);
+
+	modelMatrix.ToIdentity();
+	textureMatrix.ToIdentity();
+	Matrix4 tempMatrix = textureMatrix * modelMatrix;
+
+	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "textureMatrix"), 1, false, *&tempMatrix.values);
+	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "modelMatrix"), 1, false, *&modelMatrix.values);
+
+	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(),"cameraPos"), 1, (float*)&camera->GetPosition());
+	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
+	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "bumpTex"), 1);
+
+	UpdateShaderMatrices();
+
+	heightMap->Draw();
+
+	glDisable(GL_DEPTH_TEST);
+}
+
 void Renderer::DrawShadowHellknight()
 {
+	glEnable(GL_DEPTH_TEST);
+
 	modelMatrix = (
 		Matrix4::Translation(Vector3((RAW_WIDTH*HEIGHTMAP_X / 2.0f) + 400.0f, 300.0f, (RAW_WIDTH*HEIGHTMAP_X / 2.0f) - 200.0f)) *
 		Matrix4::Rotation(45, Vector3(0, 1, 0)) *
@@ -506,6 +526,8 @@ void Renderer::DrawShadowHellknight()
 	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "modelMatrix"), 1, false, *&modelMatrix.values);
 
 	hellNode->Draw(*this);
+
+	glDisable(GL_DEPTH_TEST);
 }
 
 #pragma endregion
