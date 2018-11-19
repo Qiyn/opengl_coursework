@@ -72,16 +72,9 @@ protected:
 
 	//Hellknight Related
 	void				InitHellknight();
-	void				DrawShadowScene();
-	void				DrawCombinedScene();
-	void				DrawTexturedHellknight();
-	void				DrawMesh();
+	void				DrawHellknight();
 
-	Shader*				shadowSceneShader;
-	Shader*				shadowShader;
-	Shader*				textureShader;
-	GLuint				shadowTex;
-	GLuint				shadowFBO;
+	Shader*				hellShader;
 	MD5FileData*		hellData;
 	MD5Node*			hellNode;
 
