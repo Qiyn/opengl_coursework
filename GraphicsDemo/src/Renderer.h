@@ -42,6 +42,8 @@ protected:
 	vector<SceneNode*>	nodeList;
 
 	//Stats Related
+	void				InitStats();
+
 	Timer*				timer;
 	Font*				basicFont;
 	Shader*				textTextureShader;
@@ -52,9 +54,12 @@ protected:
 	Vector3				fpsTextPosition;
 
 	//Scene Content Related
-	void				DrawHeightMap();
-	void				DrawWater();
+	void				InitSkybox();
 	void				DrawSkybox();
+	void				InitHeightMap();
+	void				DrawHeightMap();
+	void				InitWater();
+	void				DrawWater();
 
 	Shader*				lightShader;
 	Shader*				reflectShader;

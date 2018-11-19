@@ -2,82 +2,16 @@
 
 Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(timer) 
 {
-	//LOADING
-	reflectShader = new Shader(SHADERDIR"PerPixelVertex.glsl",
-		SHADERDIR"ReflectFragment.glsl");
-	skyboxShader = new Shader(SHADERDIR"SkyboxVertex.glsl",
-		SHADERDIR"SkyboxFragment.glsl");
-	lightShader = new Shader(SHADERDIR"BumpVertex.glsl",
-		SHADERDIR"BumpFragment.glsl");
-	textTextureShader = new Shader(SHADERDIR"TexturedVertex.glsl", 
-		SHADERDIR"TexturedFragment.glsl");
-
-	if (!reflectShader->LinkProgram() || 
-		!lightShader->LinkProgram()	||	 
-		!skyboxShader->LinkProgram() ||
-		!textTextureShader->LinkProgram())
-		return;
-	
-	basicFont = new Font(SOIL_load_OGL_texture(TEXTUREDIR"tahoma.tga", SOIL_LOAD_AUTO, 
-							SOIL_CREATE_NEW_ID, SOIL_FLAG_COMPRESS_TO_DXT), 16, 16);
-	
-	cubeMap = SOIL_load_OGL_cubemap(
-		TEXTUREDIR"rusted_west.jpg", TEXTUREDIR"rusted_east.jpg",
-		TEXTUREDIR"rusted_up.jpg", TEXTUREDIR"rusted_down.jpg",
-		TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg",
-		SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0
-	);
-	
-	heightMap = new HeightMap(TEXTUREDIR"/terrain.raw");
-	heightMap->SetTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG",
-		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	heightMap->SetBumpMap(SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG",
-		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-
-	quad = Mesh::GenerateQuad();
-	quad->SetTexture(SOIL_load_OGL_texture(TEXTUREDIR"water.TGA",
-		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
-	
-	if (!cubeMap || 
-		!heightMap->GetTexture() ||
-		!heightMap->GetBumpMap() ||
-		!quad->GetTexture())
-		return;
-
-	SetTextureRepeating(quad->GetTexture(), true);
-	SetTextureRepeating(heightMap->GetTexture(), true);
-	SetTextureRepeating(heightMap->GetBumpMap(), true);
-
-	
-
-	//INITIALISING
-	projMatrix = Matrix4::Perspective(1.0f, 10000.0f, (float)width / (float)height, 45.0f);
+	InitStats();
+	InitSkybox();
+	InitHeightMap();
+	InitWater();
+	InitHellknight();
 
 	camera = new Camera();
 	camera->SetPosition(Vector3(RAW_WIDTH*HEIGHTMAP_X / 2.0f, 500.0f, RAW_WIDTH*HEIGHTMAP_X));
 
-	light = new Light(Vector3((RAW_WIDTH*HEIGHTMAP_X / 2.0f), 500.0f, (RAW_HEIGHT*HEIGHTMAP_Z / 2.0f)),
-		Vector4(0.9f, 0.9f, 1.0f, 1.0f), (RAW_WIDTH*HEIGHTMAP_X) / 2.0f);
-
-	fpsTextMesh = new TextMesh(fpsText, *basicFont);
-	fpsTextPosition = Vector3(25.0f, 25.0f, 0.0f);
-	
-
-
-	InitHellknight();
-
-
 	init = true;
-	isStatsActive = true;
-
-	waterRotate = 0.0f;
-
-	
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
 Renderer::~Renderer(void) 
@@ -150,14 +84,28 @@ void Renderer::RenderScene()
 
 #pragma region Stats Display
 
-void Renderer::ToggleStats()
+void Renderer::InitStats()
 {
-	isStatsActive = !isStatsActive;
+	textTextureShader = new Shader(SHADERDIR"TexturedVertex.glsl",
+		SHADERDIR"TexturedFragment.glsl");
+
+	if (!textTextureShader->LinkProgram())
+		return;
+
+	basicFont = new Font(SOIL_load_OGL_texture(TEXTUREDIR"tahoma.tga", SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID, SOIL_FLAG_COMPRESS_TO_DXT), 16, 16);
+
+	fpsTextMesh = new TextMesh(fpsText, *basicFont);
+	fpsTextPosition = Vector3(25.0f, 25.0f, 0.0f);
+
+	isStatsActive = true;
 }
 
 void Renderer::DrawStats(const float size) 
 {
 	TextMesh* mesh = new TextMesh(fpsText, *basicFont);
+	
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glDepthMask(GL_FALSE);
 	
@@ -179,8 +127,15 @@ void Renderer::DrawStats(const float size)
 	glUseProgram(0);
 
 	glDepthMask(GL_TRUE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_ONE, GL_ZERO);
+	glDisable(GL_BLEND);
+
 	delete mesh;
+}
+
+void Renderer::ToggleStats()
+{
+	isStatsActive = !isStatsActive;
 }
 
 #pragma endregion
@@ -242,20 +197,70 @@ void Renderer::ClearNodeLists()
 
 #pragma region Scene Contents
 
+void Renderer::InitSkybox()
+{
+	skyboxShader = new Shader(SHADERDIR"SkyboxVertex.glsl",
+		SHADERDIR"SkyboxFragment.glsl");
+
+	if (!skyboxShader->LinkProgram())
+		return;
+
+	cubeMap = SOIL_load_OGL_cubemap(
+		TEXTUREDIR"rusted_west.jpg", TEXTUREDIR"rusted_east.jpg",
+		TEXTUREDIR"rusted_up.jpg", TEXTUREDIR"rusted_down.jpg",
+		TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg",
+		SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0
+	);
+
+	if (!cubeMap)
+		return;
+}
+
 void Renderer::DrawSkybox()
 {
 	glDepthMask(GL_FALSE);
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	SetCurrentShader(skyboxShader);
 
 	UpdateShaderMatrices();
 	quad->Draw();
 
 	glUseProgram(0);
+	
+	glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 	glDepthMask(GL_TRUE);
+}
+
+void Renderer::InitHeightMap()
+{
+	lightShader = new Shader(SHADERDIR"BumpVertex.glsl",
+		SHADERDIR"BumpFragment.glsl");
+
+	if (!lightShader->LinkProgram())
+		return;
+
+	heightMap = new HeightMap(TEXTUREDIR"/terrain.raw");
+	heightMap->SetTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG",
+		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+	heightMap->SetBumpMap(SOIL_load_OGL_texture(TEXTUREDIR"Barren RedsDOT3.JPG",
+		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+
+	if (!heightMap->GetTexture() ||
+		!heightMap->GetBumpMap())
+		return;
+
+	SetTextureRepeating(heightMap->GetTexture(), true);
+	SetTextureRepeating(heightMap->GetBumpMap(), true);
+
+	light = new Light(Vector3((RAW_WIDTH*HEIGHTMAP_X / 2.0f), 500.0f, (RAW_HEIGHT*HEIGHTMAP_Z / 2.0f)),
+		Vector4(0.9f, 0.9f, 1.0f, 1.0f), (RAW_WIDTH*HEIGHTMAP_X) / 2.0f);
 }
 
 void Renderer::DrawHeightMap()
 {
+	glEnable(GL_DEPTH_TEST);
+
 	SetCurrentShader(lightShader);
 	SetShaderLight(*light);
 
@@ -275,10 +280,35 @@ void Renderer::DrawHeightMap()
 	heightMap->Draw();
 
 	glUseProgram(0);
+	glDisable(GL_DEPTH_TEST);
+}
+
+void Renderer::InitWater()
+{
+	reflectShader = new Shader(SHADERDIR"PerPixelVertex.glsl",
+		SHADERDIR"ReflectFragment.glsl");
+
+	if (!reflectShader->LinkProgram())
+		return;
+
+	quad = Mesh::GenerateQuad();
+	quad->SetTexture(SOIL_load_OGL_texture(TEXTUREDIR"water.TGA",
+		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
+
+	if (!quad->GetTexture())
+		return;
+
+	SetTextureRepeating(quad->GetTexture(), true);
+
+	waterRotate = 0.0f;
 }
 
 void Renderer::DrawWater()
 {
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+
 	SetCurrentShader(reflectShader);
 	SetShaderLight(*light);
 
@@ -312,6 +342,10 @@ void Renderer::DrawWater()
 	textureMatrix.ToIdentity();
 
 	glUseProgram(0);
+
+	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glBlendFunc(GL_ONE, GL_ZERO);
 }
 
 #pragma region Hellknight
@@ -369,6 +403,8 @@ void Renderer::InitHellknight()
 
 void Renderer::DrawTexturedHellknight()
 {
+	glEnable(GL_DEPTH_TEST);
+
 	SetCurrentShader(textureShader);
 	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
 	
@@ -385,6 +421,7 @@ void Renderer::DrawTexturedHellknight()
 	hellNode->Draw(*this);
 
 	//glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
 }
 
 void Renderer::DrawShadowScene()
@@ -459,5 +496,3 @@ void Renderer::DrawMesh()
 #pragma endregion
 
 #pragma endregion
-
-
