@@ -5,6 +5,7 @@
 #include "../../ext/nclgl/Camera.h"
 #include "../../ext/nclgl/Frustum.h"
 #include "../../ext/nclgl/HeightMap.h"
+#include "../../ext/nclgl/MD5Mesh.h"
 #include "../../ext/nclgl/MD5Node.h"
 #include "../../ext/nclgl/SceneNode.h"
 #include "../../ext/nclgl/TextMesh.h"
@@ -31,7 +32,7 @@ protected:
 	Camera*				camera;
 	Frustum				frameFrustum;
 
-	//Scene Management Related
+	////Scene Management Related
 	void				BuildNodeLists(SceneNode* from);
 	void				SortNodeLists();
 	void				DrawNodes();

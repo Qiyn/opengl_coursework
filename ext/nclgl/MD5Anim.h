@@ -95,7 +95,7 @@ struct MD5BaseFrame {
 	Quaternion* orientations;	//Orientations for every base frame joint
 	Vector3*	positions;		//Positions for every base frame joint
 
-	MD5BaseFrame() {
+	MD5BaseFrame::MD5BaseFrame() {
 		orientations = NULL;
 		positions    = NULL;
 	}
@@ -117,7 +117,7 @@ by the flags variable of the MD5AnimJoint
 struct MD5Frame {
 	float* components;
 
-	MD5Frame() {
+	MD5Frame::MD5Frame() {
 		components = NULL;
 	}
 

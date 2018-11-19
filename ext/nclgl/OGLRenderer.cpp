@@ -133,7 +133,7 @@ OGLRenderer::OGLRenderer(Window &window)	{
 	}
 	//If we get this far, everything's going well!
 
-#ifdef _DEBUG
+#ifdef OPENGL_DEBUGGING
 	//PFNWGLCREATECONTEXTATTRIBSARBPROC glDebugMessageCallbackTEMP = (PFNWGLCREATECONTEXTATTRIBSARBPROC) wglGetProcAddress("glDebugMessageCallbackARB");
 	glDebugMessageCallbackARB(&OGLRenderer::DebugCallback, NULL);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
@@ -257,7 +257,7 @@ void OGLRenderer::SetShaderLight(const Light &l) {
 	glUniform1f(glGetUniformLocation(currentShader->GetProgram() , "lightRadius"),l.GetRadius());
 }
 
-#ifdef _DEBUG
+#ifdef OPENGL_DEBUGGING
 void OGLRenderer::DebugCallback(GLuint source, GLuint type,GLuint id, GLuint severity,
 	int length, const char* message, void* userParam)	{
 
@@ -289,6 +289,7 @@ void OGLRenderer::DebugCallback(GLuint source, GLuint type,GLuint id, GLuint sev
 			case GL_DEBUG_SEVERITY_LOW_ARB		: severityName = "Priority(Low)"		;break;
 		}
 
+		//HBA
 		if (typeName == "Type(Other)")
 			return;
 

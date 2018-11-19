@@ -1,11 +1,11 @@
 #include "Renderer.h"
 
-Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(timer) 
+Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(timer)
 {
-	//InitStats();
-	//InitSkybox();
-	//InitHeightMap();
-	//InitWater();
+	InitStats();
+	InitSkybox();
+	InitHeightMap();
+	InitWater();
 	InitHellknight();
 
 	camera = new Camera();
@@ -16,9 +16,9 @@ Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(ti
 
 Renderer::~Renderer(void) 
 {
+	delete camera;
 	delete basicFont;
 	delete fpsTextMesh;
-	delete camera;
 	delete heightMap;
 	delete quad;
 	delete reflectShader;
@@ -58,15 +58,14 @@ void Renderer::RenderScene()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//DrawSkybox();
-	//DrawHeightMap();
-	//DrawWater();
+	DrawSkybox();
+	DrawHeightMap();
+	DrawWater();
 
 	DrawHellknight();
-	
-	
-	//if (isStatsActive)
-		//DrawStats();
+
+	if (isStatsActive)
+		DrawStats();
 	
 
 	//DrawNodes();
@@ -362,6 +361,8 @@ void Renderer::InitHellknight()
 void Renderer::DrawHellknight()
 {
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
 
 	SetCurrentShader(hellShader);
 	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
@@ -380,6 +381,7 @@ void Renderer::DrawHellknight()
 
 	glUseProgram(0);
 
+	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 }
 

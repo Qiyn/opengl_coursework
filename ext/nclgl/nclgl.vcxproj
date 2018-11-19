@@ -65,7 +65,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{98D6B51B-CB0A-4389-ADC6-24082B967C3F}</ProjectGuid>
     <RootNamespace>Shared</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -92,23 +91,21 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)ext\GLEW\include;$(SolutionDir)ext\SOIL;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)ext\SOIL\$(Configuration);$(SolutionDir)ext\GLEW\lib\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>..\GLEW\include;..\SOIL;$(IncludePath)</IncludePath>
+    <LibraryPath>..\SOIL\$(Configuration);..\GLEW\lib\$(Configuration);$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)</TargetName>
-    <OutDir>$(SolutionDir)bin-d\($ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)int-d\($ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)ext\GLEW\include;$(SolutionDir)ext\SOIL;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)ext\SOIL\$(Configuration);$(SolutionDir)ext\GLEW\lib\$(Configuration);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)bin\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)int\$(ProjectName)\</IntDir>
+    <IncludePath>..\GLEW\include;..\SOIL;$(IncludePath)</IncludePath>
+    <LibraryPath>..\GLEW\lib\$(Configuration);..\SOIL\$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ProgramDataBaseFileName>
+      </ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
