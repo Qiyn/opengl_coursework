@@ -13,7 +13,7 @@
 #include <string>
 #include <math.h>
 
-#define SHADOWSIZE 2048
+#define SHADOWSIZE 1024
 
 class Renderer : public OGLRenderer
 {
@@ -24,8 +24,7 @@ public:
 	virtual void		UpdateScene(float msec);
 	virtual void		RenderScene();
 
-	void				ToggleStats();
-	void				DrawStats(const float size = 16.0f);
+	void				ToggleStats() { isStatsActive = !isStatsActive; }
 
 protected:
 	//Rendering/Culling Related
@@ -44,6 +43,7 @@ protected:
 
 	//Stats Related
 	void				InitStats();
+	void				DrawStats(const float size = 16.0f);
 
 	Timer*				timer;
 	Font*				basicFont;
@@ -66,7 +66,9 @@ protected:
 	Shader*				reflectShader;
 	Shader*				skyboxShader;
 	HeightMap*			heightMap;
+
 	Mesh*				quad;
+	
 	Light*				light;
 	GLuint				cubeMap;
 	float				waterRotate;
@@ -87,10 +89,9 @@ protected:
 	void				DrawShadowHeightMap();
 	void				DrawShadowHellknight();
 
-	Shader* sceneShader;
-	Shader* shadowShader;
-
-	GLuint shadowTex;
-	GLuint shadowFBO;
+	Shader*				sceneShader;
+	Shader*				shadowShader;
+	GLuint				shadowTex;
+	GLuint				shadowFBO;
 };
 
