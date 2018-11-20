@@ -25,5 +25,4 @@ void main(void) {
 	vec4 reflection = texture(cubeTex, reflect(incident, normalize(IN.normal)));
 
 	fragColour = (lightColour*diffuse*atten)*(diffuse + reflection);
-	fragColour.a = 1;
 }
