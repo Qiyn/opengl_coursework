@@ -3,7 +3,8 @@
 Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(timer)
 {
 	camera = new Camera();
-	camera->SetPosition(Vector3(RAW_WIDTH*HEIGHTMAP_X / 2.0f, 500.0f, RAW_WIDTH*HEIGHTMAP_X));
+	camera->SetPosition(Vector3(1910.0f, 500.0f, 3400.0f));
+	
 	light = new Light(
 		Vector3(900.0f, 2000.0f, 3500.0f),
 		Vector4(1, 1, 1, 1), 
