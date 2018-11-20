@@ -2,21 +2,22 @@
 
 Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(timer)
 {
-	InitStats();
-	InitSkybox();
-	InitHeightMap();
-	InitWater();
-	InitHellknight();
-	InitShadow();
+	//InitStats();
+	//InitSkybox();
+	//InitWater();
 
 	camera = new Camera();
 	camera->SetPosition(Vector3(RAW_WIDTH*HEIGHTMAP_X / 2.0f, 500.0f, RAW_WIDTH*HEIGHTMAP_X));
-
-	projMatrix = Matrix4::Perspective(1.0f, 15000.0f, (float)width / (float)height, 45.0f);
+	light = new Light(Vector3(RAW_WIDTH*HEIGHTMAP_X / 2.0f + 400.0f, 1000.0f, RAW_WIDTH*HEIGHTMAP_X + 200.0f),
+		Vector4(1, 1, 1, 1), 5500.0f);
+	
+	InitHellknight();
+	InitShadow();
+	InitHeightMap();
 
 	init = true;
 	
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 }
 
 Renderer::~Renderer(void) 
@@ -25,15 +26,15 @@ Renderer::~Renderer(void)
 	glDeleteFramebuffers(1, &shadowFBO);
 
 	delete camera;
-	delete basicFont;
-	delete fpsTextMesh;
+	//delete basicFont;
+	//delete fpsTextMesh;
 	delete heightMap;
-	delete quad;
-	delete reflectShader;
-	delete skyboxShader;
-	delete lightShader;
+	//delete quad;
+	//delete reflectShader;
+	//delete skyboxShader;
+	//delete lightShader;
 	delete light;
-	delete hellShader;
+	//delete hellShader;
 	delete hellData;
 	delete hellNode;
 	//delete root;
@@ -45,15 +46,15 @@ Renderer::~Renderer(void)
 
 void Renderer::UpdateScene(float msec) 
 {
-	fps = roundf(timer->GetFPS() * 10) / 10;
-	fpsText = "FPS: " + (to_string((short)fps));
+	//fps = roundf(timer->GetFPS() * 10) / 10;
+	//fpsText = "FPS: " + (to_string((short)fps));
 
-	waterRotate += msec / 1000.0f;
+	//waterRotate += msec / 1000.0f;
+
+	//viewMatrix = camera->BuildViewMatrix();
+	//frameFrustum.FromMatrix(projMatrix * viewMatrix);
 
 	camera->UpdateCamera(msec);
-	viewMatrix = camera->BuildViewMatrix();
-	frameFrustum.FromMatrix(projMatrix * viewMatrix);
-
 	hellNode->Update(msec);
 
 	//root->Update(msec);
@@ -61,26 +62,28 @@ void Renderer::UpdateScene(float msec)
 
 void Renderer::RenderScene() 
 {
-	timer->Update();
+	//timer->Update();
 
 	//BuildNodeLists(root);
 	//SortNodeLists();
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
 
-	DrawSkybox();
+	//DrawSkybox();
 	//DrawHeightMap();
-
+	
+	//glEnable(GL_DEPTH_TEST);
+	
 	DrawShadowScene();
 	DrawCombinedScene();
-	DrawWater();
+	//DrawWater();
 
-	if (isStatsActive)
-		DrawStats();
+	//if (isStatsActive)
+	//	DrawStats();
 	
 	//DrawNodes();
 
-	glUseProgram(0);
+	//glUseProgram(0);
 	SwapBuffers();
 	//ClearNodeLists();
 }
@@ -196,7 +199,7 @@ void Renderer::ClearNodeLists()
 	nodeList.clear();
 }
 
-#pragma endregion
+#pragma endregion 
 
 #pragma region Scene Contents
 
@@ -237,11 +240,8 @@ void Renderer::DrawSkybox()
 
 void Renderer::InitHeightMap()
 {
-	lightShader = new Shader(SHADERDIR"BumpVertex.glsl",
-		SHADERDIR"BumpFragment.glsl");
-
-	if (!lightShader->LinkProgram())
-		return;
+	//lightShader = new Shader(SHADERDIR"BumpVertex.glsl", SHADERDIR"BumpFragment.glsl");
+	//if (!lightShader->LinkProgram()) return;
 
 	heightMap = new HeightMap(TEXTUREDIR"/terrain.raw");
 	heightMap->SetTexture(SOIL_load_OGL_texture(TEXTUREDIR"Barren Reds.JPG",
@@ -256,8 +256,14 @@ void Renderer::InitHeightMap()
 	SetTextureRepeating(heightMap->GetTexture(), true);
 	SetTextureRepeating(heightMap->GetBumpMap(), true);
 
-	light = new Light(Vector3((RAW_WIDTH*HEIGHTMAP_X / 2.0f), 500.0f, (RAW_HEIGHT*HEIGHTMAP_Z / 2.0f)),
-		Vector4(0.9f, 0.9f, 1.0f, 1.0f), (RAW_WIDTH*HEIGHTMAP_X) / 2.0f);
+	/*light = new Light(Vector3((RAW_WIDTH*HEIGHTMAP_X / 2.0f), 500.0f, (RAW_HEIGHT*HEIGHTMAP_Z / 2.0f)),
+		Vector4(0.9f, 0.9f, 1.0f, 1.0f), (RAW_WIDTH*HEIGHTMAP_X) / 2.0f);*/
+
+	glEnable(GL_DEPTH_TEST);
+
+	projMatrix = Matrix4::Perspective(1.0f, 15000.0f, (float)width / (float)height, 45.0f);
+
+	
 }
 
 void Renderer::DrawHeightMap()
@@ -283,7 +289,7 @@ void Renderer::DrawHeightMap()
 	heightMap->Draw();
 
 	glUseProgram(0);
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 }
 
 void Renderer::InitWater()
@@ -347,24 +353,19 @@ void Renderer::DrawWater()
 	glUseProgram(0);
 
 	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 	glBlendFunc(GL_ONE, GL_ZERO);
 }
 
-#pragma region Hellknight
-
 void Renderer::InitHellknight()
 {
-	hellShader = new Shader(SHADERDIR"TexturedVertex.glsl", 
-		SHADERDIR"TexturedFragment.glsl");
-
-	if (!hellShader->LinkProgram())
-		return;
+	//hellShader = new Shader(SHADERDIR"TexturedVertex.glsl", SHADERDIR"TexturedFragment.glsl");
+	//if (!hellShader->LinkProgram())	return;
 
 	hellData = new MD5FileData(MESHDIR"hellknight.md5mesh");
-	hellNode = new MD5Node(*hellData);
-
 	hellData->AddAnim(MESHDIR"idle2.md5anim");
+
+	hellNode = new MD5Node(*hellData);
 	hellNode->PlayAnim(MESHDIR"idle2.md5anim");
 }
 
@@ -392,10 +393,8 @@ void Renderer::DrawHellknight()
 	glUseProgram(0);
 
 	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 }
-
-#pragma endregion
 
 #pragma endregion
 
@@ -403,15 +402,9 @@ void Renderer::DrawHellknight()
 
 void Renderer::InitShadow()
 {
-	sceneShader = new Shader(SHADERDIR"shadowscenevert.glsl",
-		SHADERDIR"shadowscenefrag.glsl");
-	shadowShader = new Shader(SHADERDIR"shadowVert.glsl",
-		SHADERDIR"shadowFrag.glsl");
-
-	if (!sceneShader->LinkProgram() || !shadowShader->LinkProgram())
-	{
-		return;
-	}
+	sceneShader = new Shader(SHADERDIR"shadowscenevert.glsl", SHADERDIR"shadowscenefrag.glsl");
+	shadowShader = new Shader(SHADERDIR"shadowVert.glsl", SHADERDIR"shadowFrag.glsl");
+	if (!sceneShader->LinkProgram() || !shadowShader->LinkProgram()) return;
 
 	glGenTextures(1, &shadowTex);
 	glBindTexture(GL_TEXTURE_2D, shadowTex);
@@ -439,13 +432,13 @@ void Renderer::DrawShadowScene()
 	glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
 
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, SHADOWSIZE, SHADOWSIZE);
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
 	SetCurrentShader(shadowShader);
 
-	viewMatrix = Matrix4::BuildViewMatrix(light->GetPosition(), Vector3(0, 0, 0));
+	viewMatrix = Matrix4::BuildViewMatrix(light->GetPosition(), 
+		Vector3((RAW_WIDTH*HEIGHTMAP_X / 2.0f), 1, (RAW_WIDTH*HEIGHTMAP_X / 2.0f)));
 	textureMatrix = biasMatrix * (projMatrix*viewMatrix);
 
 	UpdateShaderMatrices();
@@ -454,7 +447,6 @@ void Renderer::DrawShadowScene()
 	DrawShadowHellknight();
 
 	glUseProgram(0);
-	glDisable(GL_DEPTH_TEST);
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glViewport(0, 0, width, height);
 	
@@ -463,8 +455,6 @@ void Renderer::DrawShadowScene()
 
 void Renderer::DrawCombinedScene()
 {
-	glEnable(GL_DEPTH_TEST);
-
 	SetCurrentShader(sceneShader);
 	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
 	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "bumpTex"), 1);
@@ -484,36 +474,28 @@ void Renderer::DrawCombinedScene()
 	DrawShadowHellknight();
 
 	glUseProgram(0);
-
-	glDisable(GL_DEPTH_TEST);
 }
 
 void Renderer::DrawShadowHeightMap()
 {
-	glEnable(GL_DEPTH_TEST);
-
 	modelMatrix.ToIdentity();
-	textureMatrix.ToIdentity();
+
 	Matrix4 tempMatrix = textureMatrix * modelMatrix;
 
 	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "textureMatrix"), 1, false, *&tempMatrix.values);
 	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "modelMatrix"), 1, false, *&modelMatrix.values);
 
-	glUniform3fv(glGetUniformLocation(currentShader->GetProgram(),"cameraPos"), 1, (float*)&camera->GetPosition());
+	/*glUniform3fv(glGetUniformLocation(currentShader->GetProgram(),"cameraPos"), 1, (float*)&camera->GetPosition());
 	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "diffuseTex"), 0);
 	glUniform1i(glGetUniformLocation(currentShader->GetProgram(), "bumpTex"), 1);
-
-	UpdateShaderMatrices();
+*/
+	//UpdateShaderMatrices();
 
 	heightMap->Draw();
-
-	glDisable(GL_DEPTH_TEST);
 }
 
 void Renderer::DrawShadowHellknight()
 {
-	glEnable(GL_DEPTH_TEST);
-
 	modelMatrix = (
 		Matrix4::Translation(Vector3((RAW_WIDTH*HEIGHTMAP_X / 2.0f) + 400.0f, 300.0f, (RAW_WIDTH*HEIGHTMAP_X / 2.0f) - 200.0f)) *
 		Matrix4::Rotation(45, Vector3(0, 1, 0)) *
@@ -526,8 +508,6 @@ void Renderer::DrawShadowHellknight()
 	glUniformMatrix4fv(glGetUniformLocation(currentShader->GetProgram(), "modelMatrix"), 1, false, *&modelMatrix.values);
 
 	hellNode->Draw(*this);
-
-	glDisable(GL_DEPTH_TEST);
 }
 
 #pragma endregion
