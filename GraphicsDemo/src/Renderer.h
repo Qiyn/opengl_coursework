@@ -14,6 +14,7 @@
 #include <math.h>
 
 #define SHADOWSIZE 2048
+#define SCENE_COUNT 3
 
 class Renderer : public OGLRenderer
 {
@@ -25,8 +26,13 @@ public:
 	virtual void		RenderScene();
 
 	void				ToggleStats() { isStatsActive = !isStatsActive; }
+	void				NextScene() { activeSceneIndex++; activeSceneIndex %= SCENE_COUNT; }
+	void				PreviousScene() { activeSceneIndex--; activeSceneIndex %= SCENE_COUNT; }
 
 protected:
+
+	signed char		activeSceneIndex = 0;
+
 	//Rendering/Culling Related
 	Camera*				camera;
 	Frustum				frameFrustum;

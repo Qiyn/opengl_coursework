@@ -51,40 +51,62 @@ Renderer::~Renderer(void)
 
 void Renderer::UpdateScene(float msec) 
 {
-	fps = roundf(timer->GetFPS() * 10) / 10;
-	fpsText = "FPS: " + (to_string((short)fps));
+	switch (activeSceneIndex)
+	{
+	case 0:	//SCENE #1
+		fps = roundf(timer->GetFPS() * 10) / 10;
+		fpsText = "FPS: " + (to_string((short)fps));
 
-	waterRotate += msec / 1000.0f;
+		waterRotate += msec / 1000.0f;
 
-	camera->UpdateCamera(msec);
-	viewMatrix = camera->BuildViewMatrix();
-	frameFrustum.FromMatrix(projMatrix * viewMatrix);
+		camera->UpdateCamera(msec);
+		viewMatrix = camera->BuildViewMatrix();
+		frameFrustum.FromMatrix(projMatrix * viewMatrix);
 
-	hellNode->Update(msec);
+		hellNode->Update(msec);
 
-	//root->Update(msec);
+		//root->Update(msec);
+		break;
+	case 1:	//SCENE #2
+
+		break;
+	case 2:	//SCENE 3
+
+		break;
+	}
 }
 
 void Renderer::RenderScene() 
 {
 	timer->Update();
 
-	//BuildNodeLists(root);
-	//SortNodeLists();
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-	DrawSkybox();
-
-	DrawShadowScene();
-	DrawCombinedScene();
-
-	DrawWater();
 	
+	switch (activeSceneIndex)
+	{
+	case 0:
+		DrawSkybox();
+
+		DrawShadowScene();
+		DrawCombinedScene();
+
+		DrawWater();
+		break;
+	case 1:
+
+		break;
+	case 2:
+
+		break;
+	}
+
 	if (isStatsActive)
 		DrawStats();
 	
+	//BuildNodeLists(root);
+	//SortNodeLists();
 	//DrawNodes();
+
 	SwapBuffers();
 	//ClearNodeLists();
 }
@@ -94,7 +116,6 @@ void Renderer::RenderScene()
 void Renderer::InitStats()
 {
 	textTextureShader = new Shader(SHADERDIR"TexturedVertex.glsl", SHADERDIR"TexturedFragment.glsl");
-
 	if (!textTextureShader->LinkProgram()) return;
 
 	basicFont = new Font(SOIL_load_OGL_texture(TEXTUREDIR"tahoma.tga", SOIL_LOAD_AUTO,

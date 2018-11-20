@@ -24,6 +24,12 @@ int main()
 		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_F1))
 			renderer.ToggleStats();
 
+		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_LEFT))
+			renderer.PreviousScene();
+
+		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_RIGHT))
+			renderer.NextScene();
+
 		renderer.UpdateScene(window.GetTimer()->GetTimedMS());
 		renderer.RenderScene();
 	}
