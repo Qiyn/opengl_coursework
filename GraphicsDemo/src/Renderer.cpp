@@ -4,8 +4,11 @@ Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(ti
 {
 	camera = new Camera();
 	camera->SetPosition(Vector3(RAW_WIDTH*HEIGHTMAP_X / 2.0f, 500.0f, RAW_WIDTH*HEIGHTMAP_X));
-	light = new Light(Vector3(RAW_WIDTH*HEIGHTMAP_X / 2.0f + 400.0f, 1000.0f, RAW_WIDTH*HEIGHTMAP_X + 200.0f),
-		Vector4(1, 1, 1, 1), 5500.0f);
+	light = new Light(
+		Vector3(900.0f, 2000.0f, 3500.0f),
+		Vector4(1, 1, 1, 1), 
+		4000.0f
+	);
 	
 	InitStats();
 	InitSkybox();
@@ -52,10 +55,10 @@ void Renderer::UpdateScene(float msec)
 
 	waterRotate += msec / 1000.0f;
 
-	//viewMatrix = camera->BuildViewMatrix();
-	//frameFrustum.FromMatrix(projMatrix * viewMatrix);
-
 	camera->UpdateCamera(msec);
+	viewMatrix = camera->BuildViewMatrix();
+	frameFrustum.FromMatrix(projMatrix * viewMatrix);
+
 	hellNode->Update(msec);
 
 	//root->Update(msec);

@@ -13,7 +13,7 @@
 #include <string>
 #include <math.h>
 
-#define SHADOWSIZE 1024
+#define SHADOWSIZE 2048
 
 class Renderer : public OGLRenderer
 {

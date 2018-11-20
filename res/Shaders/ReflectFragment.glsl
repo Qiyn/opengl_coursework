@@ -23,6 +23,7 @@ void main(void) {
 	float dist = length(lightPos - IN.worldPos);
 	float atten = 1.0 - clamp(dist / lightRadius, 0.2, 1.0);
 	vec4 reflection = texture(cubeTex, reflect(incident, normalize(IN.normal)));
-	
-	fragColour = (lightColour*diffuse*atten)*(diffuse+reflection);
+
+	fragColour = (lightColour*diffuse*atten)*(diffuse + reflection);
+	fragColour.a = 1;
 }
