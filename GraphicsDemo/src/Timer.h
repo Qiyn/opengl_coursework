@@ -1,14 +1,14 @@
-#pragma once
 //////////////////////////////////////////////////////////////////////
 //
-// Timer.h: Timer class used for determining elapsed time and 
+//	Timer.h: Timer class used for determining elapsed time and 
 //              frames per second.
 //
-// Author: Steve Echols (@StackOverflow)
-// https://stackoverflow.com/questions/2160054/how-to-capture-accurate-framerate-in-opengl
+//	Author: Steve Echols (@StackOverflow)
+//	https://stackoverflow.com/questions/2160054/how-to-capture-accurate-framerate-in-opengl
 //
 //////////////////////////////////////////////////////////////////////
 
+#pragma once
 #ifndef _E_TIMER_H
 #define _E_TIMER_H
 

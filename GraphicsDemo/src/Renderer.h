@@ -1,19 +1,13 @@
 #pragma once
 
+#include "SceneOne.h"
 #include "Timer.h"
 #include "../../ext/nclgl/OGLRenderer.h"
-#include "../../ext/nclgl/Camera.h"
-#include "../../ext/nclgl/Frustum.h"
-#include "../../ext/nclgl/HeightMap.h"
-#include "../../ext/nclgl/MD5Mesh.h"
-#include "../../ext/nclgl/MD5Node.h"
-#include "../../ext/nclgl/SceneNode.h"
 #include "../../ext/nclgl/TextMesh.h"
 #include <algorithm>
 #include <string>
 #include <math.h>
 
-#define SHADOWSIZE 2048
 #define SCENE_COUNT 3
 
 class Renderer : public OGLRenderer
@@ -30,22 +24,14 @@ public:
 	void				PreviousScene() { activeSceneIndex--; activeSceneIndex %= SCENE_COUNT; }
 
 protected:
-
-	signed char		activeSceneIndex = 0;
-
-	//Rendering/Culling Related
 	Camera*				camera;
-	Frustum				frameFrustum;
 
-	////Scene Management Related
-	void				BuildNodeLists(SceneNode* from);
-	void				SortNodeLists();
-	void				DrawNodes();
-	void				DrawNode(SceneNode* n);
-	void				ClearNodeLists();
+	//Scene Data Related
+	Qiyn::SceneOne*		sceneOne;
+	//Qiyn::SceneTwo*	sceneTwo;
+	//Qiyn::SceneThree*	sceneThree;
 	
-	SceneNode*			root;
-	vector<SceneNode*>	nodeList;
+	signed char			activeSceneIndex = 0;
 
 	//Stats Related
 	void				InitStats();
@@ -60,44 +46,5 @@ protected:
 	string				fpsText;
 	Vector3				fpsTextPosition;
 
-	//Scene Content Related
-	void				InitSkybox();
-	void				DrawSkybox();
-	void				InitHeightMap();
-	void				DrawHeightMap();
-	void				InitWater();
-	void				DrawWater();
-
-	Shader*				lightShader;
-	Shader*				reflectShader;
-	Shader*				skyboxShader;
-	HeightMap*			heightMap;
-
-	Mesh*				quad;
-	
-	Light*				light;
-	GLuint				cubeMap;
-	float				waterRotate;
-
-	//Hellknight Related
-	void				InitHellknight();
-	void				DrawHellknight();
-
-	Shader*				hellShader;
-	MD5FileData*		hellData;
-	MD5Node*			hellNode;
-
-	//Shadow Related
-	void				InitShadow();
-	void				DrawShadowScene();
-	void				DrawCombinedScene();
-
-	void				DrawShadowHeightMap();
-	void				DrawShadowHellknight();
-
-	Shader*				sceneShader;
-	Shader*				shadowShader;
-	GLuint				shadowTex;
-	GLuint				shadowFBO;
 };
 

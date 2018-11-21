@@ -113,20 +113,11 @@ public:
 		return currentShader;
 	}
 
-protected:
-	virtual void	Resize(int x, int y);	
-	void			UpdateShaderMatrices();
 	void			SetCurrentShader(Shader*s);
-
+	void			UpdateShaderMatrices();
 	void			SetTextureRepeating(GLuint target, bool state);
 
 	void			SetShaderLight(const Light &l);
-
-	void			DrawDebugPerspective(Matrix4*matrix = 0);
-	void			DrawDebugOrtho(Matrix4*matrix = 0);
-
-	Shader* currentShader;
-	
 
 	Matrix4 projMatrix;		//Projection matrix
 	Matrix4 modelMatrix;	//Model matrix. NOT MODELVIEW
@@ -136,6 +127,14 @@ protected:
 	int		width;			//Render area width (not quite the same as window width)
 	int		height;			//Render area height (not quite the same as window height)
 	bool	init;			//Did the renderer initialise properly?
+
+protected:
+	virtual void	Resize(int x, int y);	
+
+	void			DrawDebugPerspective(Matrix4*matrix = 0);
+	void			DrawDebugOrtho(Matrix4*matrix = 0);
+
+	Shader* currentShader;
 
 	HDC		deviceContext;	//...Device context?
 	HGLRC	renderContext;	//Permanent Rendering Context

@@ -1,0 +1,75 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	File			:	SceneOne.h/.cpp
+//	Description		:	Data for Scene One
+//	Author			:	Hasan 'Qiyn' A. (11/18)
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+#include "../../ext/nclgl/Camera.h"
+#include "../../ext/nclgl/HeightMap.h"
+#include "../../ext/nclgl/MD5Node.h"
+
+#define SHADOWSIZE 2048
+
+namespace Qiyn
+{
+	class SceneOne
+	{
+	public:
+		SceneOne();
+		~SceneOne(void);
+
+		void		Update(float msec);
+		void		Draw(OGLRenderer& r, Camera& c);
+	
+	protected:
+		OGLRenderer*		renderer;
+		Camera*				camera;
+
+		Light*				light;
+		
+		//Skybox/Cube Map Related
+		void				InitSkybox();
+		void				DrawSkybox();
+		void				InitWater();
+		void				DrawWater();
+
+		Shader*				lightShader;
+		Shader*				reflectShader;
+		Shader*				skyboxShader;
+		Mesh*				quad;
+
+		GLuint				cubeMap;
+		float				waterRotate;
+		
+		//Height Map Related
+		void				InitHeightMap();
+		void				DrawHeightMap();
+		HeightMap*			heightMap;
+
+		//Hellknight Related
+		void				InitHellknight();
+		void				DrawHellknight();
+
+		Shader*				hellShader;
+		MD5FileData*		hellData;
+		MD5Node*			hellNode;
+
+		//Shadow Related
+		void				InitShadow();
+		void				DrawShadowScene();
+		void				DrawCombinedScene();
+
+		void				DrawShadowHeightMap();
+		void				DrawShadowHellknight();
+
+		Shader*				sceneShader;
+		Shader*				shadowShader;
+		GLuint				shadowTex;
+		GLuint				shadowFBO;
+	};
+
+}
