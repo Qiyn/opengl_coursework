@@ -25,6 +25,7 @@ Renderer::~Renderer(void)
 	currentShader = 0;
 }
 
+
 void Renderer::UpdateScene(float msec) 
 {
 	fps = roundf(timer->GetFPS() * 10) / 10;
@@ -55,13 +56,13 @@ void Renderer::RenderScene()
 	
 	switch (activeSceneIndex)
 	{
-	case 0:
+	case 0:	//SCENE #1
 		sceneOne->Draw(*this, *camera);
 		break;
-	case 1:
+	case 1:	//SCENE #2
 
 		break;
-	case 2:
+	case 2:	//SCENE #3
 
 		break;
 	}
@@ -73,7 +74,6 @@ void Renderer::RenderScene()
 	SwapBuffers();
 }
 
-#pragma region Stats Display
 
 void Renderer::InitStats()
 {
@@ -120,5 +120,3 @@ void Renderer::DrawStats(const float size)
 
 	delete mesh;
 }
-
-#pragma endregion

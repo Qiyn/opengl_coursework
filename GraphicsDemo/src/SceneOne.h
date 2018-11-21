@@ -5,7 +5,6 @@
 //	Author			:	Hasan 'Qiyn' A. (11/18)
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #pragma once
 
 #include "../../ext/nclgl/Camera.h"
@@ -19,11 +18,11 @@ namespace Qiyn
 	class SceneOne
 	{
 	public:
-		SceneOne();
-		~SceneOne(void);
+							SceneOne(void);
+							~SceneOne(void);
 
-		void		Update(float msec);
-		void		Draw(OGLRenderer& r, Camera& c);
+		void				Update(float msec);
+		void				Draw(OGLRenderer& r, Camera& c);
 	
 	protected:
 		OGLRenderer*		renderer;
@@ -37,24 +36,20 @@ namespace Qiyn
 		void				InitWater();
 		void				DrawWater();
 
-		Shader*				lightShader;
 		Shader*				reflectShader;
 		Shader*				skyboxShader;
 		Mesh*				quad;
-
 		GLuint				cubeMap;
 		float				waterRotate;
 		
 		//Height Map Related
 		void				InitHeightMap();
-		void				DrawHeightMap();
+
 		HeightMap*			heightMap;
 
 		//Hellknight Related
 		void				InitHellknight();
-		void				DrawHellknight();
 
-		Shader*				hellShader;
 		MD5FileData*		hellData;
 		MD5Node*			hellNode;
 
@@ -71,5 +66,4 @@ namespace Qiyn
 		GLuint				shadowTex;
 		GLuint				shadowFBO;
 	};
-
 }
