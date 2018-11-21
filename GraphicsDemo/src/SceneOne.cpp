@@ -2,7 +2,7 @@
 
 using namespace Qiyn;
 
-SceneOne::SceneOne(void)
+SceneOne::SceneOne(OGLRenderer* r, Camera* c) : renderer(r), camera(c)
 {
 	light = new Light(
 		Vector3(900.0f, 2000.0f, 3500.0f),
@@ -43,11 +43,8 @@ void SceneOne::Update(float msec)
 	hellNode->Update(msec);
 }
 
-void SceneOne::Draw(OGLRenderer& r, Camera& c)
+void SceneOne::Draw()
 {
-	renderer = &r;
-	camera = &c;
-
 	DrawSkybox();
 
 	DrawShadowScene();

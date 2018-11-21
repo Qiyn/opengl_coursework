@@ -18,13 +18,13 @@ namespace Qiyn
 	class SceneOne
 	{
 	public:
-							SceneOne(void);
+							SceneOne(OGLRenderer* r, Camera* c);
 							~SceneOne(void);
 
 		void				Update(float msec);
-		void				Draw(OGLRenderer& r, Camera& c);
+		void				Draw();
 	
-	protected:
+	private:
 		OGLRenderer*		renderer;
 		Camera*				camera;
 

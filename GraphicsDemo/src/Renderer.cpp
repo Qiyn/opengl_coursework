@@ -2,13 +2,13 @@
 
 Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(timer)
 {
-	InitStats();
-	
-	sceneOne = new Qiyn::SceneOne();
-
 	camera = new Camera();
 	camera->SetPosition(Vector3(1910.0f, 500.0f, 3400.0f));
 	projMatrix = Matrix4::Perspective(1.0f, 15000.0f,(float)width / (float)height, 45.0f);
+	
+	sceneOne = new Qiyn::SceneOne(this, camera);
+
+	InitStats();
 
 	init = true;
 }
@@ -28,9 +28,6 @@ Renderer::~Renderer(void)
 
 void Renderer::UpdateScene(float msec) 
 {
-	fps = roundf(timer->GetFPS() * 10) / 10;
-	fpsText = "FPS: " + (to_string((short)fps));
-	
 	camera->UpdateCamera(msec);
 	viewMatrix = camera->BuildViewMatrix();
 
@@ -46,18 +43,21 @@ void Renderer::UpdateScene(float msec)
 
 		break;
 	}
+
+	fps = roundf(timer->GetFPS() * 10) / 10;
+	fpsText = "FPS: " + (to_string((short)fps));
 }
 
 void Renderer::RenderScene() 
 {
-	timer->Update();
+	timer->Update();	//Has to be placed in Render function to measure time between calls
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	
 	switch (activeSceneIndex)
 	{
 	case 0:	//SCENE #1
-		sceneOne->Draw(*this, *camera);
+		sceneOne->Draw();
 		break;
 	case 1:	//SCENE #2
 

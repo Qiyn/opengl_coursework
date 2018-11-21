@@ -140,11 +140,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\SceneThree.cpp" />
+    <ClCompile Include="src\SceneTwo.cpp" />
     <ClCompile Include="src\SceneOne.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Application.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\SceneThree.h" />
+    <ClInclude Include="src\SceneTwo.h" />
     <ClInclude Include="src\SceneOne.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Timer.h" />

@@ -8,6 +8,8 @@
 #pragma once
 
 #include "SceneOne.h"
+#include "SceneTwo.h"
+#include "SceneThree.h"
 #include "Timer.h"
 #include "../../ext/nclgl/OGLRenderer.h"
 #include "../../ext/nclgl/TextMesh.h"
@@ -35,7 +37,7 @@ protected:
 
 	//Scene Data Related
 	Qiyn::SceneOne*		sceneOne;
-	//Qiyn::SceneTwo*	sceneTwo;
+	Qiyn::SceneTwo*		sceneTwo;
 	//Qiyn::SceneThree*	sceneThree;
 	
 	signed char			activeSceneIndex = 0;
