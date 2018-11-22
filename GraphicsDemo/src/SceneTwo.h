@@ -10,6 +10,9 @@
 #include "../../ext/nclgl/Camera.h"
 #include "../../ext/nclgl/HeightMap.h"
 #include "../../ext/nclgl/MD5Node.h"
+#include "../../ext/nclgl/OBJMesh.h"
+
+#define LIGHTNUM 8
 
 namespace Qiyn
 {
@@ -33,6 +36,32 @@ namespace Qiyn
 		Shader*				skyboxShader;
 		GLuint				cubeMap;
 
-		Mesh*				quad;
+		Mesh*				skyQuad;
+		
+		//Deferred Rendering Related
+		void				FillBuffers();
+		void				DrawPointLights();
+		void				CombineBuffers();
+		void				GenerateScreenTexture(GLuint &into, bool depth = false);
+
+		Shader*				sceneShader; // Shader to fill our GBuffers
+		Shader*				pointlightShader; // Shader to calculate lighting
+		Shader*				combineShader; // shader to stick it all together
+
+		Light*				pointLights; // Array of lighting data
+		Mesh*				heightMap; // Terrain !
+		OBJMesh*			sphere; // Light volume
+		Mesh*				screenQuad; // To draw a full - screen quad
+
+		float				rotation; // How much to increase rotation by
+
+		GLuint				bufferFBO; // FBO for our G- Buffer pass
+		GLuint				bufferColourTex; // Albedo goes here
+		GLuint				bufferNormalTex; // Normals go here
+		GLuint				bufferDepthTex; // Depth goes here
+
+		GLuint				pointLightFBO; // FBO for our lighting pass
+		GLuint				lightEmissiveTex; // Store emissive lighting
+		GLuint				lightSpecularTex; // Store specular lighting
 	};
 }
