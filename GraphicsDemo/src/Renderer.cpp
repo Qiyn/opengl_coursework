@@ -79,6 +79,23 @@ void Renderer::RenderScene()
 }
 
 
+void Renderer::NextScene()
+{
+	if (activeSceneIndex + 1 > 2)
+		activeSceneIndex = 0;
+	else
+		activeSceneIndex++;
+}
+
+void Renderer::PreviousScene()
+{
+	if (activeSceneIndex - 1 < 0)
+		activeSceneIndex = 2;
+	else
+		activeSceneIndex--;
+}
+
+
 void Renderer::InitStats()
 {
 	textTextureShader = new Shader(SHADERDIR"TexturedVertex.glsl", SHADERDIR"TexturedFragment.glsl");

@@ -28,9 +28,10 @@ public:
 	virtual void		UpdateScene(float msec);
 	virtual void		RenderScene();
 
+	void				NextScene();
+	void				PreviousScene();
+	
 	void				ToggleStats() { isStatsActive = !isStatsActive; }
-	void				NextScene() { activeSceneIndex++; activeSceneIndex %= SCENE_COUNT; }
-	void				PreviousScene() { activeSceneIndex--; activeSceneIndex %= SCENE_COUNT; }
 
 protected:
 	Camera*				camera;
