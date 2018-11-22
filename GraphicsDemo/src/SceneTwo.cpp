@@ -30,8 +30,8 @@ void SceneTwo::InitSkybox()
 	if (!skyboxShader->LinkProgram()) return;
 
 	cubeMap = SOIL_load_OGL_cubemap(
-		TEXTUREDIR"rusted_west.jpg", TEXTUREDIR"rusted_east.jpg", TEXTUREDIR"rusted_up.jpg",
-		TEXTUREDIR"rusted_down.jpg", TEXTUREDIR"rusted_south.jpg", TEXTUREDIR"rusted_north.jpg",
+		TEXTUREDIR"lightblue/right-s.png", TEXTUREDIR"lightblue/left-s.png", TEXTUREDIR"lightblue/top-s.png",
+		TEXTUREDIR"lightblue/bot-s.png", TEXTUREDIR"lightblue/back-s.png", TEXTUREDIR"lightblue/front-s.png",
 		SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0
 	);
 	if (!cubeMap) return;
@@ -44,8 +44,12 @@ void SceneTwo::DrawSkybox()
 	glDepthMask(GL_FALSE);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+
 	renderer->SetCurrentShader(skyboxShader);
 	renderer->UpdateShaderMatrices();
+
+	glUniform1i(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(),
+		"cubeTex"), 0);
 
 	quad->Draw();
 

@@ -145,6 +145,9 @@ void SceneOne::DrawSkybox()
 	renderer->SetCurrentShader(skyboxShader);
 	renderer->UpdateShaderMatrices();
 
+	glUniform1i(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(),
+		"cubeTex"), 2);
+
 	quad->Draw();
 
 	glUseProgram(0);
