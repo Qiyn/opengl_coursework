@@ -6,7 +6,7 @@ SceneTwo::SceneTwo(OGLRenderer* r, Camera* c) : renderer(r), camera(c)
 {
 	InitSkybox();
 
-	//InitElse();
+	InitElse();
 }
 
 SceneTwo::~SceneTwo(void)
@@ -41,14 +41,12 @@ void SceneTwo::Update(float msec)
 
 void SceneTwo::Draw()
 {
-	DrawSkybox();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-	
-	//FillBuffers();
-	//DrawPointLights();
-	//CombineBuffers();
+	//DrawSkybox(); TODO: Add skybox
+	FillBuffers();
+	DrawPointLights();
+	CombineBuffers();
 }
 
 
@@ -212,8 +210,14 @@ void SceneTwo::GenerateScreenTexture(GLuint & into, bool depth)
 
 void SceneTwo::FillBuffers()
 {
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, bufferFBO);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+	
 
 	renderer->SetCurrentShader(sceneShader);
 	glUniform1i(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(),
@@ -230,14 +234,19 @@ void SceneTwo::FillBuffers()
 
 	glUseProgram(0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glDisable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
 }
 
 void SceneTwo::DrawPointLights()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	renderer->SetCurrentShader(pointlightShader);
 
@@ -306,12 +315,22 @@ void SceneTwo::DrawPointLights()
 
 	glClearColor(0.2f, 0.2f, 0.2f, 1);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
+
 	glUseProgram(0);
+
+	glDisable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void SceneTwo::CombineBuffers()
 {
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+
 	renderer->SetCurrentShader(combineShader);
 
 	renderer->projMatrix = Matrix4::Orthographic(-1, 1, 1, -1, -1, 1);
@@ -336,4 +355,8 @@ void SceneTwo::CombineBuffers()
 	screenQuad->Draw();
 
 	glUseProgram(0);
+
+	glDisable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
 }
