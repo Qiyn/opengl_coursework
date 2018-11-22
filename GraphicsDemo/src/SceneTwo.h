@@ -25,5 +25,14 @@ namespace Qiyn
 	private:
 		OGLRenderer*		renderer;
 		Camera*				camera;
+
+		//Skybox/Cube Map Related
+		void				InitSkybox();
+		void				DrawSkybox();
+
+		Shader*				skyboxShader;
+		GLuint				cubeMap;
+
+		Mesh*				quad;
 	};
 }
