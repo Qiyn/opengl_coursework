@@ -13,6 +13,7 @@
 #include "../../ext/nclgl/OBJMesh.h"
 
 #define LIGHTNUM 8
+#define POST_PASSES 10
 
 namespace Qiyn
 {
@@ -64,5 +65,14 @@ namespace Qiyn
 		GLuint				pointLightFBO; // FBO for our lighting pass
 		GLuint				lightEmissiveTex; // Store emissive lighting
 		GLuint				lightSpecularTex; // Store specular lighting
+
+		//Post-Processing Related
+		void				InitPostProcessing();
+		void				DrawPostProcessing();
+
+		Shader* processShader;
+		Mesh* processQuad;
+
+		GLuint processFBO;
 	};
 }

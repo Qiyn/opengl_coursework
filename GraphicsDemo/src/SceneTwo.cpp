@@ -5,8 +5,8 @@ using namespace Qiyn;
 SceneTwo::SceneTwo(OGLRenderer* r, Camera* c) : renderer(r), camera(c)
 {
 	InitSkybox();
-
 	InitElse();
+	//InitPostProcessing();
 }
 
 SceneTwo::~SceneTwo(void)
@@ -17,11 +17,13 @@ SceneTwo::~SceneTwo(void)
 	delete sceneShader;
 	delete combineShader;
 	delete pointlightShader;
+	//delete processShader;
 
 	delete heightMap;
 	delete sphere;
 	delete screenQuad;
 	delete[] pointLights;
+	//delete processQuad;
 
 	glDeleteTextures(1, &bufferColourTex);
 	glDeleteTextures(1, &bufferNormalTex);
@@ -31,6 +33,8 @@ SceneTwo::~SceneTwo(void)
 
 	glDeleteFramebuffers(1, &bufferFBO);
 	glDeleteFramebuffers(1, &pointLightFBO);
+
+	glDeleteFramebuffers(1, &processFBO);
 }
 
 
@@ -44,6 +48,7 @@ void SceneTwo::Draw()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//DrawSkybox(); TODO: Add skybox
+	//DrawPostProcessing(); TODO: Add PostProcessing
 	FillBuffers();
 	DrawPointLights();
 	CombineBuffers();
@@ -100,9 +105,12 @@ void SceneTwo::InitElse()
 			float zPos = (RAW_HEIGHT * HEIGHTMAP_Z / (LIGHTNUM - 1)) * z;
 			l.SetPosition(Vector3(xPos, 100.0f, zPos));
 
-			float r = 0.5f + (float)(rand() % 129) / 128.0f;
-			float g = 0.5f + (float)(rand() % 129) / 128.0f;
-			float b = 0.5f + (float)(rand() % 129) / 128.0f;
+			//float r = 0.5f + (float)(rand() % 129) / 128.0f;
+			//float g = 0.5f + (float)(rand() % 129) / 128.0f;
+			//float b = 0.5f + (float)(rand() % 129) / 128.0f;
+			float r = 0.75f;
+			float g = 0.0f;
+			float b = 0.0f;
 			l.SetColour(Vector4(r, g, b, 1.0f));
 
 			float radius = (RAW_WIDTH * HEIGHTMAP_X / LIGHTNUM);
@@ -218,7 +226,6 @@ void SceneTwo::FillBuffers()
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	
-
 	renderer->SetCurrentShader(sceneShader);
 	glUniform1i(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(),
 		"diffuseTex"), 0);
@@ -315,8 +322,6 @@ void SceneTwo::DrawPointLights()
 
 	glClearColor(0.2f, 0.2f, 0.2f, 1);
 
-	
-
 	glUseProgram(0);
 
 	glDisable(GL_BLEND);
@@ -360,3 +365,52 @@ void SceneTwo::CombineBuffers()
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 }
+
+
+void SceneTwo::InitPostProcessing()
+{
+	processQuad = Mesh::GenerateQuad();
+
+	processShader = new Shader(SHADERDIR"TexturedVertex.glsl", SHADERDIR"processfrag.glsl");
+	if (!processShader->LinkProgram()) return;
+
+	glGenFramebuffers(1, &processFBO);
+}
+
+//void Qiyn::SceneTwo::DrawPostProcessing()
+//{
+//	glBindFramebuffer(GL_FRAMEBUFFER, processFBO);
+//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[1], 0);
+//
+//	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+//
+//	renderer->SetCurrentShader(processShader);
+//	renderer->projMatrix = Matrix4::Orthographic(-1, 1, 1, -1, -1, 1);
+//	renderer->viewMatrix.ToIdentity();
+//	renderer->UpdateShaderMatrices();
+//
+//	glDisable(GL_DEPTH_TEST);
+//
+//	glUniform2f(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(), "pixelSize"), 1.0f / renderer->width, 1.0f / renderer->height);
+//
+//	for (int i = 0; i < POST_PASSES; ++i)
+//	{
+//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[1], 0);
+//		glUniform1i(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(), "isVertical"), 0);
+//
+//		processQuad->SetTexture(bufferColourTex[0]);
+//		processQuad->Draw();
+//		//Now to swap the colour buffers, and do the second blue pass
+//		glUniform1i(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(), "isVertical"), 1);
+//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[0], 0);
+//
+//		processQuad->SetTexture(bufferColourTex[1]);
+//		processQuad->Draw();
+//	}
+//
+//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//	glUseProgram(0);
+//
+//	glEnable(GL_DEPTH_TEST);
+//}
+
