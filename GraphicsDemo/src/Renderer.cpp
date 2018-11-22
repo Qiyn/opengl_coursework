@@ -7,6 +7,8 @@ Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(ti
 	projMatrix = Matrix4::Perspective(1.0f, 15000.0f,(float)width / (float)height, 45.0f);
 	
 	sceneOne = new Qiyn::SceneOne(this, camera);
+	sceneTwo = new Qiyn::SceneTwo(this, camera);
+	sceneThree = new Qiyn::SceneThree(this, camera);
 
 	InitStats();
 
@@ -18,7 +20,9 @@ Renderer::~Renderer(void)
 	delete camera;
 
 	delete sceneOne;
-	
+	delete sceneTwo;
+	delete sceneThree;
+
 	delete basicFont;
 	delete fpsTextMesh;
 	
@@ -37,10 +41,10 @@ void Renderer::UpdateScene(float msec)
 		sceneOne->Update(msec);
 		break;
 	case 1:	//SCENE #2
-
+		sceneTwo->Update(msec);
 		break;
 	case 2:	//SCENE 3
-
+		sceneThree->Update(msec);
 		break;
 	}
 
@@ -60,10 +64,10 @@ void Renderer::RenderScene()
 		sceneOne->Draw();
 		break;
 	case 1:	//SCENE #2
-
+		sceneTwo->Draw();
 		break;
 	case 2:	//SCENE #3
-
+		sceneThree->Draw();
 		break;
 	}
 

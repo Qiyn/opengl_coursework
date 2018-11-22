@@ -1,12 +1,24 @@
 #include "SceneThree.h"
 
+using namespace Qiyn;
 
-
-SceneThree::SceneThree()
+SceneThree::SceneThree(OGLRenderer* r, Camera* c) : renderer(r), camera(c)
 {
+
+}
+
+SceneThree::~SceneThree(void)
+{
+
 }
 
 
-SceneThree::~SceneThree()
+void SceneThree::Update(float msec)
 {
+
+}
+
+void SceneThree::Draw()
+{
+
 }

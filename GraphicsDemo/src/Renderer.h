@@ -38,7 +38,7 @@ protected:
 	//Scene Data Related
 	Qiyn::SceneOne*		sceneOne;
 	Qiyn::SceneTwo*		sceneTwo;
-	//Qiyn::SceneThree*	sceneThree;
+	Qiyn::SceneThree*	sceneThree;
 	
 	signed char			activeSceneIndex = 0;
 
