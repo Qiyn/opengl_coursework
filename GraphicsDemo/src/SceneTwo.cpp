@@ -105,10 +105,7 @@ SceneTwo::SceneTwo(OGLRenderer* r, Camera* c) : renderer(r), camera(c)
 		return;
 	}
 
-	/*glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);*/
+	
 }
 
 SceneTwo::~SceneTwo(void)
@@ -232,6 +229,11 @@ void SceneTwo::FillBuffers()
 
 void SceneTwo::DrawPointLights()
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+
 	renderer->SetCurrentShader(pointlightShader);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, pointLightFBO);
