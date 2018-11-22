@@ -145,10 +145,10 @@ protected:
 	static OGLRenderer*	  debugDrawingRenderer;
 	static Shader*		  debugDrawShader;
 
-#ifdef _DEBUG
+
 	static void CALLBACK DebugCallback(GLuint source, GLuint type,GLuint id, GLuint severity,
 									   int length, const char* message, void* userParam);
-#endif
+
 
 	static bool	drawnDebugOrtho;
 	static bool	drawnDebugPerspective;
