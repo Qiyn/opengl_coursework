@@ -39,6 +39,7 @@ namespace Qiyn
 		Mesh*				skyQuad;
 		
 		//Deferred Rendering Related
+		void				InitElse();		//TO REMOVE
 		void				FillBuffers();
 		void				DrawPointLights();
 		void				CombineBuffers();
