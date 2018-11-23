@@ -8,7 +8,7 @@ SceneThree::SceneThree(OGLRenderer* r, Camera* c) : renderer(r), camera(c)
 
 	InitParticles();
 
-	renderer->projMatrix = Matrix4::Perspective(1.0f, 15000.0f, (float)renderer->width / (float)renderer->height, 45.0f);
+	//renderer->projMatrix = Matrix4::Perspective(1.0f, 15000.0f, (float)renderer->width / (float)renderer->height, 45.0f);
 }
 
 SceneThree::~SceneThree(void)
@@ -81,8 +81,17 @@ void SceneThree::DrawSkybox()
 
 void SceneThree::InitParticles()
 {
-	glGenVertexArrays(1, &vertexArray);
-	glBindVertexArray(vertexArray);
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		particles[i].Position = Vector3();
+		particles[i].Life = 5.0f;
+		particles[i].CameraDistance = -1.0f;
+		particles[i].r = 1.0f;
+		particles[i].g = 1.0f;
+		particles[i].b = 1.0f;
+		particles[i].a = 1.0f;
+		particles[i].Size = (rand() % 1000) / 2000.0f + 0.1f;
+	}
 
 	particleShader = new Shader(SHADERDIR"ParticleVertex.glsl", SHADERDIR"ParticleFragment.glsl");
 	if (!particleShader->LinkProgram()) return;
@@ -93,35 +102,75 @@ void SceneThree::InitParticles()
 
 	particleTexID = glGetUniformLocation(particleShader->GetProgram(), "myTextureSampler");
 
-	for (int i = 0; i < MAX_PARTICLES; i++) 
+	/*for (int i = 0; i < MAX_PARTICLES; i++) 
 	{
 		particles[i].Life = -1.0f;
 		particles[i].CameraDistance = -1.0f;
-	}
+	}*/
 
 	particleQuad = Mesh::GenerateQuad();
 	particleQuad->SetTexture(SOIL_load_OGL_texture(TEXTUREDIR"star1.png",
 		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS));
 	particleTex = particleQuad->GetTexture();
 
+	glGenVertexArrays(1, &vertexArray);
+	glBindVertexArray(vertexArray);
 	
 	glGenBuffers(1, &billboard_vertex_buffer);
+	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, billboard_vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glVertexAttribPointer(
+		0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
+		3,                  // size
+		GL_FLOAT,           // type
+		GL_FALSE,           // normalized?
+		0,                  // stride
+		(void*)0            // array buffer offset
+	);
 
 	// The VBO containing the positions and sizes of the particles
 	
 	glGenBuffers(1, &particles_position_buffer);
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
 	// Initialize with empty (NULL) buffer : it will be updated later, each frame.
-	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW);
+	glVertexAttribPointer(
+		1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+		4,                                // size : x + y + z + size => 4
+		GL_FLOAT,                         // type
+		GL_FALSE,                         // normalized?
+		0,                                // stride
+		(void*)0                          // array buffer offset
+	);
 
 	// The VBO containing the colors of the particles
 	
 	glGenBuffers(1, &particles_color_buffer);
+	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
 	// Initialize with empty (NULL) buffer : it will be updated later, each frame.
-	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
+	glVertexAttribPointer(
+		2,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+		4,                                // size : r + g + b + a => 4
+		GL_UNSIGNED_BYTE,                 // type
+		GL_TRUE,                          // normalized?    *** YES, this means that the unsigned char[4] will be accessible with a vec4 (floats) in the shader ***
+		0,                                // stride
+		(void*)0                          // array buffer offset
+	);
+
+	
+
+	glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
+	glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLfloat) * 4, g_particule_position_size_data);
+
+	glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
+	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
+	glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLubyte) * 4, g_particule_color_data);
+
 }
 
 void SceneThree::UpdateParticles(float dt)
@@ -130,9 +179,24 @@ void SceneThree::UpdateParticles(float dt)
 
 	viewProjMatrixValues = camera->BuildViewMatrix() * renderer->projMatrix;
 
+	// Clear the screen
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	renderer->UpdateShaderMatrices();
+	Matrix4 ProjectionMatrix = renderer->projMatrix;
+	Matrix4 ViewMatrix = renderer->viewMatrix;
+
+	// We will need the camera's position in order to sort the particles
+	// w.r.t the camera's distance.
+	// There should be a getCameraPosition() function in common/controls.cpp, 
+	// but this works too.
+
+	Matrix4 ViewProjectionMatrix = ProjectionMatrix * ViewMatrix;
+
+
 	// Generate 10 new particule each millisecond,
-		// but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
-		// newparticles will be huge and the next frame even longer.
+	// but limit this to 16 ms (60 fps), or if you have 1 long frame (1sec),
+	// newparticles will be huge and the next frame even longer.
 	int newparticles = (int)(dt*10000.0);
 	if (newparticles > (int)(0.016f*10000.0))
 		newparticles = (int)(0.016f*10000.0);
@@ -157,17 +221,19 @@ void SceneThree::UpdateParticles(float dt)
 
 
 		// Very bad way to generate a random color
-		particles[particleIndex].Colour.x = rand() % 256;
-		particles[particleIndex].Colour.y = rand() % 256;
-		particles[particleIndex].Colour.z = rand() % 256;
-		particles[particleIndex].Colour.w = (rand() % 256) / 3;
+		particles[particleIndex].r = rand() % 256;
+		particles[particleIndex].g = rand() % 256;
+		particles[particleIndex].b = rand() % 256;
+		particles[particleIndex].a = (rand() % 256) / 3;
 
 		particles[particleIndex].Size = (rand() % 1000) / 2000.0f + 0.1f;
+
 	}
 
 
+
 	// Simulate all particles
-	ParticlesCount = 0;
+	int ParticlesCount = 0;
 	for (int i = 0; i < MAX_PARTICLES; i++) {
 
 		Particle& p = particles[i]; // shortcut
@@ -191,10 +257,10 @@ void SceneThree::UpdateParticles(float dt)
 
 				g_particule_position_size_data[4 * ParticlesCount + 3] = p.Size;
 
-				g_particule_color_data[4 * ParticlesCount + 0] = p.Colour.x;
-				g_particule_color_data[4 * ParticlesCount + 1] = p.Colour.y;
-				g_particule_color_data[4 * ParticlesCount + 2] = p.Colour.z;
-				g_particule_color_data[4 * ParticlesCount + 3] = p.Colour.w;
+				g_particule_color_data[4 * ParticlesCount + 0] = p.r;
+				g_particule_color_data[4 * ParticlesCount + 1] = p.g;
+				g_particule_color_data[4 * ParticlesCount + 2] = p.b;
+				g_particule_color_data[4 * ParticlesCount + 3] = p.a;
 
 			}
 			else {
@@ -208,10 +274,17 @@ void SceneThree::UpdateParticles(float dt)
 	}
 
 	SortParticles();
-}
 
-void SceneThree::DrawParticles()
-{
+
+	//printf("%d ",ParticlesCount);
+
+
+	// Update the buffers that OpenGL uses for rendering.
+	// There are much more sophisticated means to stream data from the CPU to the GPU, 
+	// but this is outside the scope of this tutorial.
+	// http://www.opengl.org/wiki/Buffer_Object_Streaming
+
+
 	glBindBuffer(GL_ARRAY_BUFFER, particles_position_buffer);
 	glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * 4 * sizeof(GLfloat), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
 	glBufferSubData(GL_ARRAY_BUFFER, 0, ParticlesCount * sizeof(GLfloat) * 4, g_particule_position_size_data);
@@ -234,10 +307,10 @@ void SceneThree::DrawParticles()
 	glUniform1i(particleTexID, 0);
 
 	// Same as the billboards tutorial
-	glUniform3f(cameraRightWorldspace, camera->BuildViewMatrix().values[0], camera->BuildViewMatrix().values[1], camera->BuildViewMatrix().values[2]);
-	glUniform3f(cameraUpWorldspace, camera->BuildViewMatrix().values[4], camera->BuildViewMatrix().values[5], camera->BuildViewMatrix().values[6]);
+	glUniform3f(cameraRightWorldspace,  ViewMatrix.values[0], ViewMatrix.values[1], ViewMatrix.values[2]);
+	glUniform3f(cameraUpWorldspace, ViewMatrix.values[3], ViewMatrix.values[4], ViewMatrix.values[5]);
 
-	glUniformMatrix4fv(viewProjMatrix, 1, GL_FALSE, &viewProjMatrixValues.values[0]);
+	glUniformMatrix4fv(viewProjMatrix, 1, GL_FALSE, &ViewProjectionMatrix.values[0]);
 
 	// 1rst attribute buffer : vertices
 	glEnableVertexAttribArray(0);
@@ -293,6 +366,11 @@ void SceneThree::DrawParticles()
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+}
+
+void SceneThree::DrawParticles()
+{
+	
 }
 
 int SceneThree::FindUnusedParticle()
