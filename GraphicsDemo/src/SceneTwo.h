@@ -12,8 +12,7 @@
 #include "../../ext/nclgl/MD5Node.h"
 #include "../../ext/nclgl/OBJMesh.h"
 
-#define LIGHTNUM 8
-#define POST_PASSES 10
+#define LIGHTNUM 5
 
 namespace Qiyn
 {
@@ -30,49 +29,34 @@ namespace Qiyn
 		OGLRenderer*		renderer;
 		Camera*				camera;
 
-		//Skybox/Cube Map Related
-		void				InitSkybox();
-		void				DrawSkybox();
-
-		Shader*				skyboxShader;
-		GLuint				cubeMap;
-
-		Mesh*				skyQuad;
 		
 		//Deferred Rendering Related
-		void				InitElse();		//TO REMOVE
+		void				InitDeferred();
 		void				FillBuffers();
 		void				DrawPointLights();
 		void				CombineBuffers();
 		void				GenerateScreenTexture(GLuint &into, bool depth = false);
 
-		Shader*				sceneShader; // Shader to fill our GBuffers
-		Shader*				pointlightShader; // Shader to calculate lighting
-		Shader*				combineShader; // shader to stick it all together
+		Shader*				sceneShader;
+		Shader*				pointlightShader;
+		Shader*				combineShader;
 
-		Light*				pointLights; // Array of lighting data
-		Mesh*				heightMap; // Terrain !
-		OBJMesh*			sphere; // Light volume
-		Mesh*				screenQuad; // To draw a full - screen quad
+		Light*				pointLights;
+		Mesh*				heightMap;
+		OBJMesh*			sphere;
+		Mesh*				screenQuad;
 
-		float				rotation; // How much to increase rotation by
+		float				rotation;
+		float				scaling;
+		float				scalingModifier;
 
-		GLuint				bufferFBO; // FBO for our G- Buffer pass
-		GLuint				bufferColourTex; // Albedo goes here
-		GLuint				bufferNormalTex; // Normals go here
-		GLuint				bufferDepthTex; // Depth goes here
+		GLuint				bufferFBO;
+		GLuint				bufferColourTex;
+		GLuint				bufferNormalTex;
+		GLuint				bufferDepthTex;
 
-		GLuint				pointLightFBO; // FBO for our lighting pass
-		GLuint				lightEmissiveTex; // Store emissive lighting
-		GLuint				lightSpecularTex; // Store specular lighting
-
-		//Post-Processing Related
-		void				InitPostProcessing();
-		void				DrawPostProcessing();
-
-		Shader* processShader;
-		Mesh* processQuad;
-
-		GLuint processFBO;
+		GLuint				pointLightFBO;
+		GLuint				lightEmissiveTex;
+		GLuint				lightSpecularTex;
 	};
 }

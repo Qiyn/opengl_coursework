@@ -4,26 +4,22 @@ using namespace Qiyn;
 
 SceneTwo::SceneTwo(OGLRenderer* r, Camera* c) : renderer(r), camera(c)
 {
-	InitSkybox();
-	InitElse();
-	//InitPostProcessing();
+	InitDeferred();
+
+	scaling = 1;
+	scalingModifier = 1;
 }
 
 SceneTwo::~SceneTwo(void)
 {
-	delete skyboxShader;
-	delete skyQuad;
-
 	delete sceneShader;
 	delete combineShader;
 	delete pointlightShader;
-	//delete processShader;
 
 	delete heightMap;
 	delete sphere;
 	delete screenQuad;
 	delete[] pointLights;
-	//delete processQuad;
 
 	glDeleteTextures(1, &bufferColourTex);
 	glDeleteTextures(1, &bufferNormalTex);
@@ -33,66 +29,30 @@ SceneTwo::~SceneTwo(void)
 
 	glDeleteFramebuffers(1, &bufferFBO);
 	glDeleteFramebuffers(1, &pointLightFBO);
-
-	glDeleteFramebuffers(1, &processFBO);
 }
 
 
 void SceneTwo::Update(float msec)
 {
 	rotation = msec * 0.01f;
+
+	scaling += (msec / 10) * scalingModifier;
+
+	if (scaling > (RAW_WIDTH * HEIGHTMAP_X / LIGHTNUM) || scaling < 0)
+		scalingModifier *= -1;
+
 }
 
 void SceneTwo::Draw()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//DrawSkybox(); TODO: Add skybox
-	//DrawPostProcessing(); TODO: Add PostProcessing
 	FillBuffers();
 	DrawPointLights();
 	CombineBuffers();
 }
 
-
-void SceneTwo::InitSkybox()
-{
-	skyboxShader = new Shader(SHADERDIR"SkyboxVertex.glsl", SHADERDIR"SkyboxFragment.glsl");
-	if (!skyboxShader->LinkProgram()) return;
-
-	cubeMap = SOIL_load_OGL_cubemap(
-		TEXTUREDIR"lightblue/right-s.png", TEXTUREDIR"lightblue/left-s.png", TEXTUREDIR"lightblue/top-s.png",
-		TEXTUREDIR"lightblue/bot-s.png", TEXTUREDIR"lightblue/front-s.png", TEXTUREDIR"lightblue/back-s.png",
-		SOIL_LOAD_RGB, SOIL_CREATE_NEW_ID, 0
-	);
-	if (!cubeMap) return;
-
-	skyQuad = Mesh::GenerateQuad();
-}
-
-void SceneTwo::DrawSkybox()
-{
-	glDepthMask(GL_FALSE);
-	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
-	renderer->SetCurrentShader(skyboxShader);
-	renderer->UpdateShaderMatrices();
-	
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap);
-	glUniform1i(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(),
-		"cubeTex"), 2);
-
-	skyQuad->Draw();
-
-	glUseProgram(0);
-
-	glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-	glDepthMask(GL_TRUE);
-}
-
-
-void SceneTwo::InitElse()
+void SceneTwo::InitDeferred()
 {
 	screenQuad = Mesh::GenerateQuad();
 
@@ -105,9 +65,6 @@ void SceneTwo::InitElse()
 			float zPos = (RAW_HEIGHT * HEIGHTMAP_Z / (LIGHTNUM - 1)) * z;
 			l.SetPosition(Vector3(xPos, 100.0f, zPos));
 
-			//float r = 0.5f + (float)(rand() % 129) / 128.0f;
-			//float g = 0.5f + (float)(rand() % 129) / 128.0f;
-			//float b = 0.5f + (float)(rand() % 129) / 128.0f;
 			float r = 0.75f;
 			float g = 0.0f;
 			float b = 0.0f;
@@ -290,7 +247,7 @@ void SceneTwo::DrawPointLights()
 	for (int x = 0; x < LIGHTNUM; ++x) {
 		for (int z = 0; z < LIGHTNUM; ++z) {
 			Light &l = pointLights[(x * LIGHTNUM) + z];
-			float radius = l.GetRadius();
+			float radius = scaling;
 
 			renderer->modelMatrix =
 				pushMatrix *
@@ -365,52 +322,4 @@ void SceneTwo::CombineBuffers()
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 }
-
-
-void SceneTwo::InitPostProcessing()
-{
-	processQuad = Mesh::GenerateQuad();
-
-	processShader = new Shader(SHADERDIR"TexturedVertex.glsl", SHADERDIR"processfrag.glsl");
-	if (!processShader->LinkProgram()) return;
-
-	glGenFramebuffers(1, &processFBO);
-}
-
-//void Qiyn::SceneTwo::DrawPostProcessing()
-//{
-//	glBindFramebuffer(GL_FRAMEBUFFER, processFBO);
-//	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[1], 0);
-//
-//	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-//
-//	renderer->SetCurrentShader(processShader);
-//	renderer->projMatrix = Matrix4::Orthographic(-1, 1, 1, -1, -1, 1);
-//	renderer->viewMatrix.ToIdentity();
-//	renderer->UpdateShaderMatrices();
-//
-//	glDisable(GL_DEPTH_TEST);
-//
-//	glUniform2f(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(), "pixelSize"), 1.0f / renderer->width, 1.0f / renderer->height);
-//
-//	for (int i = 0; i < POST_PASSES; ++i)
-//	{
-//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[1], 0);
-//		glUniform1i(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(), "isVertical"), 0);
-//
-//		processQuad->SetTexture(bufferColourTex[0]);
-//		processQuad->Draw();
-//		//Now to swap the colour buffers, and do the second blue pass
-//		glUniform1i(glGetUniformLocation(renderer->GetCurrentShader()->GetProgram(), "isVertical"), 1);
-//		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bufferColourTex[0], 0);
-//
-//		processQuad->SetTexture(bufferColourTex[1]);
-//		processQuad->Draw();
-//	}
-//
-//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//	glUseProgram(0);
-//
-//	glEnable(GL_DEPTH_TEST);
-//}
 
