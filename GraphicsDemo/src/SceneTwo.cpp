@@ -34,8 +34,6 @@ SceneTwo::~SceneTwo(void)
 
 void SceneTwo::Update(float msec)
 {
-	rotation = msec * 0.01f;
-
 	scaling += (msec / 10) * scalingModifier;
 
 	if (scaling > (RAW_WIDTH * HEIGHTMAP_X / LIGHTNUM) || scaling < 0)
@@ -51,6 +49,7 @@ void SceneTwo::Draw()
 	DrawPointLights();
 	CombineBuffers();
 }
+
 
 void SceneTwo::InitDeferred()
 {

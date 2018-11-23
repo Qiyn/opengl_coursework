@@ -32,6 +32,7 @@ public:
 	void				PreviousScene();
 	
 	void				ToggleStats() { isStatsActive = !isStatsActive; }
+	void				ResetCamera();
 
 protected:
 	Camera*				camera;

@@ -8,12 +8,13 @@ int main()
 	Timer timer;
 	timer.Init();
 
-	Window window("[2018/19] CSC8502 Coursework - By Hasan Ahmed", 1280, 720, false);
+	Window window("[2018/19] CSC8502 Coursework - By Hasan Ahmed", 1280, 720, true);
+	
 	if (!window.HasInitialised()) 
 		return -1;
 
-	//window.LockMouseToWindow(true);
-	//window.ShowOSPointer(false);
+	window.LockMouseToWindow(true);
+	window.ShowOSPointer(false);
 
 	Renderer renderer(window, &timer);
 	if (!renderer.HasInitialised()) 
@@ -29,6 +30,9 @@ int main()
 
 		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_RIGHT))
 			renderer.NextScene();
+
+		if (Window::GetKeyboard()->KeyTriggered(KEYBOARD_F5))
+			renderer.ResetCamera();
 
 		renderer.UpdateScene(window.GetTimer()->GetTimedMS());
 		renderer.RenderScene();

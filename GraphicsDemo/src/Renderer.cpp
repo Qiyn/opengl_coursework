@@ -3,7 +3,8 @@
 Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(timer)
 {
 	camera = new Camera();
-	camera->SetPosition(Vector3(1910.0f, 500.0f, 3400.0f));
+	ResetCamera();
+
 	projMatrix = Matrix4::Perspective(1.0f, 15000.0f,(float)width / (float)height, 45.0f);
 	
 	sceneOne = new Qiyn::SceneOne(this, camera);
@@ -95,6 +96,12 @@ void Renderer::PreviousScene()
 		activeSceneIndex--;
 }
 
+void Renderer::ResetCamera()
+{
+	camera->SetPosition(Vector3(1960.0f, 515.0f, 3500.0f));
+	camera->SetPitch(-4.0f);
+	camera->SetYaw(360.0f);
+}
 
 void Renderer::InitStats()
 {
