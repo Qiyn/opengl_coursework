@@ -148,7 +148,6 @@
     <ClCompile Include="src\Application.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\SceneThree.h" />
     <ClInclude Include="src\SceneTwo.h" />
     <ClInclude Include="src\SceneOne.h" />
