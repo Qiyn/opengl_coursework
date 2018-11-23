@@ -10,6 +10,7 @@ Renderer::Renderer(Window &parent, Timer* timer) : OGLRenderer(parent), timer(ti
 	sceneOne = new Qiyn::SceneOne(this, camera);
 	sceneTwo = new Qiyn::SceneTwo(this, camera);
 	sceneThree = new Qiyn::SceneThree(this, camera);
+	//sceneFour = new Qiyn::SceneFour(this, camera);
 
 	InitStats();
 
@@ -23,6 +24,7 @@ Renderer::~Renderer(void)
 	delete sceneOne;
 	delete sceneTwo;
 	delete sceneThree;
+	//delete sceneFour;
 
 	delete basicFont;
 	delete fpsTextMesh;
@@ -47,6 +49,9 @@ void Renderer::UpdateScene(float msec)
 	case 2:	//SCENE 3
 		sceneThree->Update(msec);
 		break;
+	//case 3:	//SCENE 4
+	//	sceneFour->Update(msec);
+	//	break;
 	}
 
 	fps = roundf(timer->GetFPS() * 10) / 10;
@@ -70,6 +75,9 @@ void Renderer::RenderScene()
 	case 2:	//SCENE #3
 		sceneThree->Draw();
 		break;
+	//case 3:	//SCENE #4
+	//	sceneFour->Draw();
+	//	break;
 	}
 
 	if (isStatsActive)

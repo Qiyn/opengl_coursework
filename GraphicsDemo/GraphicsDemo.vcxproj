@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\SceneFour.cpp" />
     <ClCompile Include="src\SceneThree.cpp" />
     <ClCompile Include="src\SceneTwo.cpp" />
     <ClCompile Include="src\SceneOne.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="src\Application.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\SceneFour.h" />
     <ClInclude Include="src\SceneThree.h" />
     <ClInclude Include="src\SceneTwo.h" />
     <ClInclude Include="src\SceneOne.h" />

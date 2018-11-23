@@ -10,6 +10,8 @@
 #include "SceneOne.h"
 #include "SceneTwo.h"
 #include "SceneThree.h"
+#include "SceneFour.h"
+
 #include "Timer.h"
 #include "../../ext/nclgl/OGLRenderer.h"
 #include "../../ext/nclgl/TextMesh.h"
@@ -41,6 +43,7 @@ protected:
 	Qiyn::SceneOne*		sceneOne;
 	Qiyn::SceneTwo*		sceneTwo;
 	Qiyn::SceneThree*	sceneThree;
+	//Qiyn::SceneFour*	sceneFour;
 	
 	signed char			activeSceneIndex = 0;
 
