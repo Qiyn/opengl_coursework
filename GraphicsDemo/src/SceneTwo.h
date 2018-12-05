@@ -19,14 +19,14 @@ namespace Qiyn
 	class SceneTwo
 	{
 	public:
-							SceneTwo(OGLRenderer* r, Camera* c);
-							~SceneTwo(void);
+						SceneTwo(OGLRenderer* r, Camera* c);
+						~SceneTwo(void);
 
 		void				Update(float msec);
 		void				Draw();
 	
 	private:
-		OGLRenderer*		renderer;
+		OGLRenderer*			renderer;
 		Camera*				camera;
 
 		
