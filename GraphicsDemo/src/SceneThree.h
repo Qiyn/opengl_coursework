@@ -18,14 +18,14 @@ namespace Qiyn
 	class SceneThree
 	{
 	public:
-							SceneThree(OGLRenderer* r, Camera* c);
-							~SceneThree(void);
+						SceneThree(OGLRenderer* r, Camera* c);
+						~SceneThree(void);
 
 		void				Update(float msec);
 		void				Draw();
 
 	private:
-		OGLRenderer*		renderer;
+		OGLRenderer*			renderer;
 		Camera*				camera;
 
 		Light*				light;
@@ -50,7 +50,7 @@ namespace Qiyn
 		//Hellknight Related
 		void				InitHellknight();
 
-		MD5FileData*		hellData;
+		MD5FileData*			hellData;
 		MD5Node*			hellNode;
 
 		//Shadow Related
