@@ -1,2 +1,2 @@
-# CSC8502_Coursework
+# OpenGL Coursework
 
