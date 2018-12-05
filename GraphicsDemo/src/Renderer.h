@@ -24,11 +24,11 @@
 class Renderer : public OGLRenderer
 {
 public:
-						Renderer(Window &parent, Timer* timer);
+					Renderer(Window &parent, Timer* timer);
 	virtual				~Renderer(void);
 
-	virtual void		UpdateScene(float msec);
-	virtual void		RenderScene();
+	virtual void			UpdateScene(float msec);
+	virtual void			RenderScene();
 
 	void				NextScene();
 	void				PreviousScene();
@@ -40,10 +40,9 @@ protected:
 	Camera*				camera;
 
 	//Scene Data Related
-	Qiyn::SceneOne*		sceneOne;
-	Qiyn::SceneTwo*		sceneTwo;
-	Qiyn::SceneThree*	sceneThree;
-	//Qiyn::SceneFour*	sceneFour;
+	Qiyn::SceneOne*			sceneOne;
+	Qiyn::SceneTwo*			sceneTwo;
+	Qiyn::SceneThree*		sceneThree;
 	
 	signed char			activeSceneIndex = 0;
 
